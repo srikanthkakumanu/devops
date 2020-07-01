@@ -1,0 +1,45 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  # Vagrant box setup with Operating System
+  config.vm.box = "debian/buster64"
+  config.disksize.size = '10GB'
+
+  # Provider Settings
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "ci_ansible_jenkins"
+    vb.memory = 2048
+    vb.cpus = 2
+
+  end
+ 
+  # Network Settings
+  # guest is vagrant box and host is local machine
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+  config.vm.network "private_network", ip: "192.168.111.222"
+  # config.vm.network "public_network"
+
+  # Folder Settings
+  # "./apache2/data" is your local machine folder
+  # "/var/www/html" is your vagrant box folder
+  # nfs: network file system. It improves performance of your vagrant box
+  # :mount_options: is used to set permissions
+  # dmode: directory mode set to 777
+  # fmode: file mode set to 666
+  # config.vm.synced_folder "./apache2/data", "/var/www/html", :nfs => {:mount_options => ["dmode=777", "fmode=666"]} 
+  # config.vm.synced_folder "./apache2/data", "/var/www/html" 
+
+
+  # Provision Settings
+  # via SHELL
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y tree
+  SHELL
+
+  # via Ansible
+  
+end
