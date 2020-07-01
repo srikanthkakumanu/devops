@@ -1,45 +1,98 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# Multi-Machine Environment mimicking production environment using Vagrant
 Vagrant.configure("2") do |config|
 
-  # Vagrant box setup with Operating System
-  config.vm.box = "debian/buster64"
-  config.disksize.size = '10GB'
+    config.vm.define "jenkins_ansible_master" do |ansjenkins|
+        ansjenkins.vm.box = "debian/buster64"
+        ansjenkins.vm.hostname = "ansjenkins"
+        config.vm.network "private_network", ip: "192.168.10.10"
+        
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
+    end    
 
-  # Provider Settings
-  config.vm.provider "virtualbox" do |vb|
-    vb.name = "ci_ansible_jenkins"
-    vb.memory = 2048
-    vb.cpus = 2
+    config.vm.define "loadbalancer" do |loadbalancer|
+        loadbalancer.vm.box = "debian/buster64"
+        loadbalancer.vm.hostname = "loadbalancer"
+        config.vm.network "private_network", ip: "192.168.10.11"
 
-  end
- 
-  # Network Settings
-  # guest is vagrant box and host is local machine
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
-  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
-  config.vm.network "private_network", ip: "192.168.111.222"
-  # config.vm.network "public_network"
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
+    end    
 
-  # Folder Settings
-  # "./apache2/data" is your local machine folder
-  # "/var/www/html" is your vagrant box folder
-  # nfs: network file system. It improves performance of your vagrant box
-  # :mount_options: is used to set permissions
-  # dmode: directory mode set to 777
-  # fmode: file mode set to 666
-  # config.vm.synced_folder "./apache2/data", "/var/www/html", :nfs => {:mount_options => ["dmode=777", "fmode=666"]} 
-  # config.vm.synced_folder "./apache2/data", "/var/www/html" 
+    config.vm.define "webserver" do |webserver|
+        webserver.vm.box = "debian/buster64"
+        webserver.vm.hostname = "webserver"
+        config.vm.network "private_network", ip: "192.168.10.12"
 
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
+    end    
 
-  # Provision Settings
-  # via SHELL
-  config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    apt-get install -y tree
-  SHELL
+    config.vm.define "apigateway" do |apigateway|
+        apigateway.vm.box = "debian/buster64"
+        apigateway.vm.hostname = "apigateway"
+        config.vm.network "private_network", ip: "192.168.10.13"
 
-  # via Ansible
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
+    end    
+
+    config.vm.define "clinic" do |clinic|
+        clinic.vm.box = "debian/buster64"
+        clinic.vm.hostname = "clinic"
+        config.vm.network "private_network", ip: "192.168.10.14"
+
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
+    end    
+
+    config.vm.define "doctor" do |doctor|
+        doctor.vm.box = "debian/buster64"
+        doctor.vm.hostname = "doctor"
+        config.vm.network "private_network", ip: "192.168.10.15"
+
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
+    end    
+
+    config.vm.define "riak" do |db|
+        db.vm.box = "debian/buster64"
+        db.vm.hostname = "riak"
+        config.vm.network "private_network", ip: "192.168.10.16"
+
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
+    end    
+
+    
+    config.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      apt-get install -y tree
+    SHELL
   
-end
+  end
+  

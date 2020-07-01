@@ -29,7 +29,9 @@ To manage(add/remove/update/list) Boxes to VirtualBox: `vagrant box add debian/b
 
 To start Vagrant environment:   `vagrant up`
 
-To shutdown Vagrant environment:   `vagrant suspend`
+To shutdown Vagrant environment:   `vagrant halt`
+
+To save state and suspends Vagrant environment:   `vagrant suspend`
 
 To resume Vagrant environment:      `vagrant resume`
 
@@ -117,4 +119,33 @@ Vagrant box can be provisioned using a script or by using automation tools such 
     config.vm.provision :ansible do |ansible| 
         ansible.playbook = "provisioning/playbook.yml"
         ansible.inventory_path = "provisioning/ansible_hosts"
+    end
+
+## Multi-Machine Environment
+<HR></HR>
+
+Instead of installing everything in one box, Vagrant can create multiple environments by creating multiple box images as shown below.
+
+    config.vm.define "loadbalancer" do |loadbalancer|
+        loadbalancer.vm.box = "debian/buster64"
+        loadbalancer.vm.hostname = "loadbalancer"
+        config.vm.network "private_network", ip: "192.168.10.111"
+
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
+    end    
+
+    config.vm.define "webserver" do |webserver|
+        webserver.vm.box = "debian/buster64"
+        webserver.vm.hostname = "webserver"
+        config.vm.network "private_network", ip: "192.168.10.112"
+
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = 1024
+            vb.cpus = 2
+        end
     end
