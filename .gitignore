@@ -1,0 +1,6 @@
+./ansible
+./backup
+./vagrant
+./ansible/*
+./backup/*
+./vagrant/*
