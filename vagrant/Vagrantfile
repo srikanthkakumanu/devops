@@ -5,7 +5,6 @@
 
 $commonscript = <<-SCRIPT
     sudo apt update -y
-    apt install -y tree
     sudo echo "192.168.10.11   ansjenkins     jenkins_ansible_master" >> /etc/hosts
     sudo echo "192.168.10.12   loadbalancer   loadbalancer" >> /etc/hosts
     sudo echo "192.168.10.13   webserver      webserver" >> /etc/hosts
@@ -18,11 +17,13 @@ SCRIPT
 $masterscript = <<-SCRIPT
     ansjenkins.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
     sudo apt install ansible -y 
+    sudo apt install git -y
 SCRIPT
 
 $nodescript = <<-SCRIPT
     cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
     sudo rm -r /home/vagrant/.ssh/id_rsa.pub 
+    git clone 
 SCRIPT
 
 class Configurator 
