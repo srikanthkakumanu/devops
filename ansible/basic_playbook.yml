@@ -3,8 +3,8 @@
     become: yes
     become_method: sudo
     become_user: root
-  tasks:
-    - name: Install basic software packages
-      apt: pkg=tree,git,curl state=present
+    tasks:
+      - name: Install basic software packages
+        apt: pkg=tree,git,curl state=present
 
 
