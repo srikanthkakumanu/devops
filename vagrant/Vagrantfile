@@ -15,6 +15,11 @@ $commonscript = <<-SCRIPT
     sudo echo "192.168.10.17   riak           riak" >> /etc/hosts
 SCRIPT
 
+$masterscript = <<-SCRIPT
+    ansjenkins.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
+    sudo apt install ansible -y 
+SCRIPT
+
 $nodescript = <<-SCRIPT
     cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
     sudo rm -r /home/vagrant/.ssh/id_rsa.pub 
@@ -35,6 +40,14 @@ class Configurator
         vb.memory = memory
         vb.cpus = cpus
     end
+    # Box Provisions based on condition
+    def self.provision(vm, isMaster)
+        if isMaster == true
+            vm.provision "shell", inline: $masterscript
+        else
+            vm.provision "shell", inline: $nodescript
+        end
+    end
 end
 
 Vagrant.configure("2") do |config|
@@ -44,7 +57,7 @@ Vagrant.configure("2") do |config|
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        ansjenkins.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
+        Configurator.provision(ansjenkins.vm, true)
     end    
 
     config.vm.define "loadbalancer" do |loadbalancer|
@@ -52,59 +65,60 @@ Vagrant.configure("2") do |config|
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        
         loadbalancer.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        loadbalancer.vm.provision "shell", inline: $nodescript        
+        Configurator.provision(loadbalancer.vm, false)       
     end    
 
-    config.vm.define "webserver" do |webserver|
-        Configurator.box(webserver.vm, "debian/buster64", "webserver", "192.168.10.13")
-        config.vm.provider "virtualbox" do |vb|
-            Configurator.settings(vb, true, 1024, 2)
-        end
+    # config.vm.define "webserver" do |webserver|
+    #     Configurator.box(webserver.vm, "debian/buster64", "webserver", "192.168.10.13")
+    #     config.vm.provider "virtualbox" do |vb|
+    #         Configurator.settings(vb, true, 1024, 2)
+    #     end
         
-        webserver.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        webserver.vm.provision "shell", inline: $nodescript        
-    end    
+    #     webserver.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+    #     Configurator.provision(webserver.vm, false)       
+        
+    # end    
 
-    config.vm.define "apigateway" do |apigateway|
-        Configurator.box(apigateway.vm, "debian/buster64", "apigateway", "192.168.10.14")
-        config.vm.provider "virtualbox" do |vb|
-            Configurator.settings(vb, true, 1024, 2)
-        end
+    # config.vm.define "apigateway" do |apigateway|
+    #     Configurator.box(apigateway.vm, "debian/buster64", "apigateway", "192.168.10.14")
+    #     config.vm.provider "virtualbox" do |vb|
+    #         Configurator.settings(vb, true, 1024, 2)
+    #     end
         
-        apigateway.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        apigateway.vm.provision "shell", inline: $nodescript        
-    end    
+    #     apigateway.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+    #     Configurator.provision(apigateway.vm, false)       
+        
+    # end    
 
-    config.vm.define "clinic" do |clinic|
-        Configurator.box(clinic.vm, "debian/buster64", "clinic", "192.168.10.15")
-        config.vm.provider "virtualbox" do |vb|
-            Configurator.settings(vb, true, 1024, 2)
-        end
+    # config.vm.define "clinic" do |clinic|
+    #     Configurator.box(clinic.vm, "debian/buster64", "clinic", "192.168.10.15")
+    #     config.vm.provider "virtualbox" do |vb|
+    #         Configurator.settings(vb, true, 1024, 2)
+    #     end
         
-        clinic.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        clinic.vm.provision "shell", inline: $nodescript        
-    end    
+    #     clinic.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+    #     Configurator.provision(clinic.vm, false)       
+    # end    
 
-    config.vm.define "doctor" do |doctor|
-        Configurator.box(doctor.vm, "debian/buster64", "doctor", "192.168.10.16")
-        config.vm.provider "virtualbox" do |vb|
-            Configurator.settings(vb, true, 1024, 2)
-        end
+    # config.vm.define "doctor" do |doctor|
+    #     Configurator.box(doctor.vm, "debian/buster64", "doctor", "192.168.10.16")
+    #     config.vm.provider "virtualbox" do |vb|
+    #         Configurator.settings(vb, true, 1024, 2)
+    #     end
         
-        doctor.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        doctor.vm.provision "shell", inline: $nodescript        
-    end    
+    #     doctor.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+    #     Configurator.provision(doctor.vm, false)       
+    # end    
 
-    config.vm.define "riak" do |db|
-        Configurator.box(db.vm, "debian/buster64", "riak", "192.168.10.17")
-        config.vm.provider "virtualbox" do |vb|
-            Configurator.settings(vb, true, 1024, 2)
-        end
+    # config.vm.define "riak" do |db|
+    #     Configurator.box(db.vm, "debian/buster64", "riak", "192.168.10.17")
+    #     config.vm.provider "virtualbox" do |vb|
+    #         Configurator.settings(vb, true, 1024, 2)
+    #     end
         
-        db.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        db.vm.provision "shell", inline: $nodescript        
-    end    
+    #     db.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+    #     Configurator.provision(db.vm, false)       
+    # end    
   end
   
