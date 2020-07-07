@@ -1,30 +1,10 @@
-# Basic approach for installing packages
+---
+  - hosts: lb
+    become: yes
+    become_method: sudo
+    become_user: root
+  tasks:
+    - name: Install basic software packages
+      apt: pkg=tree,git,curl state=present
 
-# - name: "Installing VIM"
-#   apt: pkg=vim state=present
-
-# - name: "Installing CURL"
-#   apt: pkg=curl state=present
-
-# - name: "Installing GIT"
-#   apt: pkg=git state=present
-
-# - name: "Installing DNS UTILS"
-#   apt: pkg=dnsutils state=present
-
-# Alternative approach for installing packages
-# - name: "Installing basic software packages"
-#   apt: pkg= {{ item }} state=present
-#   with_items:
-#   - dnsutils
-#   - git
-#   - vim
-#   - ntp
-#   - at
-#   - lvm2
-#   - tree
-
-# Another alternative approach for installing packages
-- name: "Installing basic software packages"
-  apt: pkg=tree,git,curl state=present
 
