@@ -15,15 +15,14 @@ $commonscript = <<-SCRIPT
 SCRIPT
 
 $masterscript = <<-SCRIPT
-    ansjenkins.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
     sudo apt install ansible -y 
     sudo apt install git -y
+    git clone https://github.com/srikanthkakumanu/devops.git
 SCRIPT
 
 $nodescript = <<-SCRIPT
     cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
     sudo rm -r /home/vagrant/.ssh/id_rsa.pub 
-    git clone 
 SCRIPT
 
 class Configurator 
@@ -44,6 +43,7 @@ class Configurator
     # Box Provisions based on condition
     def self.provision(vm, isMaster)
         if isMaster == true
+            vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
             vm.provision "shell", inline: $masterscript
         else
             vm.provision "shell", inline: $nodescript
