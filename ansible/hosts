@@ -2,16 +2,16 @@
 192.168.10.12   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
 
 [webapp]
-192.168.10.13   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
+#192.168.10.13   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
 
 [apigateway]
-192.168.10.14   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
+#192.168.10.14   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
 
 [clinic]
-192.168.10.15   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
+#192.168.10.15   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
 
 [doctor]
-192.168.10.16   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
+#192.168.10.16   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
 
 [riak]
-192.168.10.17   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
+#192.168.10.17   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=/vagrant/insecure_private_key
