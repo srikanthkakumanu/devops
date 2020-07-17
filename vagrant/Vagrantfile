@@ -94,5 +94,5 @@ Vagrant.configure("2") do |config|
 #         end
 #         Configurator.provision(db.vm, false)       
 #     end    
-#   end
+   end
   
