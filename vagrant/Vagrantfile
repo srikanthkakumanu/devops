@@ -7,6 +7,7 @@ $controllerscript = <<-script
     sudo apt update -y
     sudo apt install -y ansible 
     sudo apt install -y git
+    git clone https://github.com/srikanthkakumanu/devops.git
 script
 
 class Configurator 
@@ -26,12 +27,17 @@ class Configurator
     def self.provision(vm, isController)
         if isController == true
             vm.provision "shell", inline: $controllerscript
-            vm.provision "file", source: "~/.vagrant.d/insecure_private_key", destination: "/vagrant/insecure_private_key"
+            vm.provision "file", source: "~/.ssh/id_rsa", destination: "/vagrant/insecure_private_key"
+        else
+            vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
         end
     end
 end
 
 Vagrant.configure("2") do |config|
+
+    # Configuring own SSH Key
+    config.ssh.insert_key = false
 
     config.vm.define "controller" do |controller|
         Configurator.box(controller.vm, "debian/buster64", "controller", "192.168.10.11")
