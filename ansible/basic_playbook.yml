@@ -1,7 +1,9 @@
 ---
 - hosts: all
   remote_user: vagrant
-  sudo: yes
+  become: yes
+  become_method: sudo
+  become_user: root
   tasks:
     - group:
         name: devops
@@ -19,14 +21,16 @@
 
 - hosts: lb
   user: vagrant
-  sudo: yes
+  become: yes
+  become_method: sudo
+  become_user: root
   tasks:
     - name: install pre-requisite packages for nginx
       apt: pkg=tree,curl,gnupg2,ca-certificates,lsb-release state=present
 
-    - name: add official nginx repository
-      apt_repository:
-        repo: "deb http://nginx.org/packages/debian `lsb_release -cs` nginx"
+    # - name: add official nginx repository
+    #   apt_repository:
+    #     repo: "deb http://nginx.org/packages/debian buster nginx"
     
     - name: install nginx web server and ensure its at the latest version
       apt:
