@@ -5,8 +5,6 @@
 
 $commonscript = <<-SCRIPT
     sudo apt update -y
-    sudo apt upgrade -y
-    apt install -y tree
     sudo echo "192.168.10.11   ansjenkins     jenkins_ansible_master" >> /etc/hosts
     sudo echo "192.168.10.12   loadbalancer   loadbalancer" >> /etc/hosts
     sudo echo "192.168.10.13   webserver      webserver" >> /etc/hosts
@@ -14,126 +12,246 @@ $commonscript = <<-SCRIPT
     sudo echo "192.168.10.15   clinic         clinic" >> /etc/hosts
     sudo echo "192.168.10.16   doctor         doctor" >> /etc/hosts
     sudo echo "192.168.10.17   riak           riak" >> /etc/hosts
-    SCRIPT
+SCRIPT
+
+$masterscript = <<-SCRIPT
+    sudo apt install ansible -y 
+    sudo apt install git -y
+    git clone https://github.com/srikanthkakumanu/devops.git
+SCRIPT
 
 $nodescript = <<-SCRIPT
     cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
     sudo rm -r /home/vagrant/.ssh/id_rsa.pub 
 SCRIPT
 
-
+class Configurator 
+    # Defines Vagrant Box with given box name, host name, ip address
+    def self.box(vm, os, host, ip)
+        vm.box = os
+        vm.hostname = host
+        vm.network "private_network", ip: ip
+        vm.provision "shell", inline: $commonscript    
+    end
+    # Defines VM settings such as cloning, memory, no.of CPUs
+    def self.settings(vb, clone, memory, cpus)
+        vb.linked_clone = clone
+        vb.memory = memory
+        vb.cpus = cpus
+    end
+    # Box Provisions based on condition
+    def self.provision(vm, isMaster)
+        if isMaster == true
+            vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
+            vm.provision "shell", inline: $masterscript
+        else
+            vm.provision "shell", inline: $nodescript
+        end
+    end
+end
 
 Vagrant.configure("2") do |config|
 
     config.vm.define "jenkins_ansible_master" do |ansjenkins|
-        ansjenkins.vm.box = "debian/buster64"
-        ansjenkins.vm.hostname = "ansjenkins"
-        ansjenkins.vm.network "private_network", ip: "192.168.10.11"
-        
+        Configurator.box(ansjenkins.vm, "debian/buster64", "ansjenkins", "192.168.10.11")
         config.vm.provider "virtualbox" do |vb|
-            vb.linked_clone = true
-            vb.memory = 1024
-            vb.cpus = 2
+            Configurator.settings(vb, true, 1024, 2)
         end
-
-        ansjenkins.vm.provision "shell", inline: $commonscript
-        ansjenkins.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
+        Configurator.provision(ansjenkins.vm, true)
     end    
 
     config.vm.define "loadbalancer" do |loadbalancer|
-        loadbalancer.vm.box = "debian/buster64"
-        loadbalancer.vm.hostname = "loadbalancer"
-        loadbalancer.vm.network "private_network", ip: "192.168.10.12"
-
+        Configurator.box(loadbalancer.vm, "debian/buster64", "loadbalancer", "192.168.10.12")
         config.vm.provider "virtualbox" do |vb|
-            vb.linked_clone = true
-            vb.memory = 1024
-            vb.cpus = 2
+            Configurator.settings(vb, true, 1024, 2)
         end
-
         loadbalancer.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        loadbalancer.vm.provision "shell", inline: $commonscript
-        loadbalancer.vm.provision "shell", inline: $nodescript        
+        Configurator.provision(loadbalancer.vm, false)       
     end    
 
     config.vm.define "webserver" do |webserver|
-        webserver.vm.box = "debian/buster64"
-        webserver.vm.hostname = "webserver"
-        webserver.vm.network "private_network", ip: "192.168.10.13"
-
+        Configurator.box(webserver.vm, "debian/buster64", "webserver", "192.168.10.13")
         config.vm.provider "virtualbox" do |vb|
-            vb.linked_clone = true
-            vb.memory = 1024
-            vb.cpus = 2
+            Configurator.settings(vb, true, 1024, 2)
         end
-
         webserver.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        webserver.vm.provision "shell", inline: $commonscript
-        webserver.vm.provision "shell", inline: $nodescript        
+        Configurator.provision(webserver.vm, false)       
     end    
 
     config.vm.define "apigateway" do |apigateway|
-        apigateway.vm.box = "debian/buster64"
-        apigateway.vm.hostname = "apigateway"
-        apigateway.vm.network "private_network", ip: "192.168.10.14"
-
+        Configurator.box(apigateway.vm, "debian/buster64", "apigateway", "192.168.10.14")
         config.vm.provider "virtualbox" do |vb|
-            vb.linked_clone = true
-            vb.memory = 1024
-            vb.cpus = 2
+            Configurator.settings(vb, true, 1024, 2)
         end
-
         apigateway.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        apigateway.vm.provision "shell", inline: $commonscript
-        apigateway.vm.provision "shell", inline: $nodescript        
+        Configurator.provision(apigateway.vm, false)       
     end    
 
     config.vm.define "clinic" do |clinic|
-        clinic.vm.box = "debian/buster64"
-        clinic.vm.hostname = "clinic"
-        clinic.vm.network "private_network", ip: "192.168.10.15"
-
+        Configurator.box(clinic.vm, "debian/buster64", "clinic", "192.168.10.15")
         config.vm.provider "virtualbox" do |vb|
-            vb.linked_clone = true
-            vb.memory = 1024
-            vb.cpus = 2
+            Configurator.settings(vb, true, 1024, 2)
         end
-
         clinic.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        clinic.vm.provision "shell", inline: $commonscript
-        clinic.vm.provision "shell", inline: $nodescript        
+        Configurator.provision(clinic.vm, false)       
     end    
 
     config.vm.define "doctor" do |doctor|
-        doctor.vm.box = "debian/buster64"
-        doctor.vm.hostname = "doctor"
-        doctor.vm.network "private_network", ip: "192.168.10.16"
-
+        Configurator.box(doctor.vm, "debian/buster64", "doctor", "192.168.10.16")
         config.vm.provider "virtualbox" do |vb|
-            vb.linked_clone = true
-            vb.memory = 1024
-            vb.cpus = 2
+            Configurator.settings(vb, true, 1024, 2)
         end
-
         doctor.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        doctor.vm.provision "shell", inline: $commonscript
-        doctor.vm.provision "shell", inline: $nodescript        
+        Configurator.provision(doctor.vm, false)       
     end    
 
     config.vm.define "riak" do |db|
-        db.vm.box = "debian/buster64"
-        db.vm.hostname = "riak"
-        db.vm.network "private_network", ip: "192.168.10.17"
-
+        Configurator.box(db.vm, "debian/buster64", "riak", "192.168.10.17")
         config.vm.provider "virtualbox" do |vb|
-            vb.linked_clone = true
-            vb.memory = 1024
-            vb.cpus = 2
+            Configurator.settings(vb, true, 1024, 2)
         end
-
         db.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        db.vm.provision "shell", inline: $commonscript
-        db.vm.provision "shell", inline: $nodescript        
+        Configurator.provision(db.vm, false)       
     end    
+    config.ssh.insert_key = false
   end
+  
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# Multi-Machine Environment mimicking production environment using Vagrant
+#
+#$commonscript = <<-SCRIPT
+#    sudo apt update -y
+#    sudo apt upgrade -y
+#    apt install -y tree
+#    sudo echo "192.168.10.11   ansjenkins     jenkins_ansible_master" >> /etc/hosts
+#    sudo echo "192.168.10.12   loadbalancer   loadbalancer" >> /etc/hosts
+#    sudo echo "192.168.10.13   webserver      webserver" >> /etc/hosts
+#    sudo echo "192.168.10.14   apigateway     apigateway" >> /etc/hosts
+#    sudo echo "192.168.10.15   clinic         clinic" >> /etc/hosts
+#    sudo echo "192.168.10.16   doctor         doctor" >> /etc/hosts
+#    sudo echo "192.168.10.17   riak           riak" >> /etc/hosts
+#    SCRIPT
+#
+#$nodescript = <<-SCRIPT
+#    cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
+#    sudo rm -r /home/vagrant/.ssh/id_rsa.pub 
+#SCRIPT
+#
+#
+#
+#Vagrant.configure("2") do |config|
+#
+#    config.vm.define "jenkins_ansible_master" do |ansjenkins|
+#        ansjenkins.vm.box = "debian/buster64"
+#        ansjenkins.vm.hostname = "ansjenkins"
+#        ansjenkins.vm.network "private_network", ip: "192.168.10.11"
+#        
+#        config.vm.provider "virtualbox" do |vb|
+#            vb.linked_clone = true
+#            vb.memory = 1024
+#            vb.cpus = 2
+#        end
+#
+#        ansjenkins.vm.provision "shell", inline: $commonscript
+#        ansjenkins.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
+#    end    
+#
+#    config.vm.define "loadbalancer" do |loadbalancer|
+#        loadbalancer.vm.box = "debian/buster64"
+#        loadbalancer.vm.hostname = "loadbalancer"
+#        loadbalancer.vm.network "private_network", ip: "192.168.10.12"
+#
+#        config.vm.provider "virtualbox" do |vb|
+#            vb.linked_clone = true
+#            vb.memory = 1024
+#            vb.cpus = 2
+#        end
+#
+#        loadbalancer.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+#        loadbalancer.vm.provision "shell", inline: $commonscript
+#        loadbalancer.vm.provision "shell", inline: $nodescript        
+#    end    
+#
+#    config.vm.define "webserver" do |webserver|
+#        webserver.vm.box = "debian/buster64"
+#        webserver.vm.hostname = "webserver"
+#        webserver.vm.network "private_network", ip: "192.168.10.13"
+#
+#        config.vm.provider "virtualbox" do |vb|
+#            vb.linked_clone = true
+#            vb.memory = 1024
+#            vb.cpus = 2
+#        end
+#
+#        webserver.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+#        webserver.vm.provision "shell", inline: $commonscript
+#        webserver.vm.provision "shell", inline: $nodescript        
+#    end    
+#
+#    config.vm.define "apigateway" do |apigateway|
+#        apigateway.vm.box = "debian/buster64"
+#        apigateway.vm.hostname = "apigateway"
+#        apigateway.vm.network "private_network", ip: "192.168.10.14"
+#
+#        config.vm.provider "virtualbox" do |vb|
+#            vb.linked_clone = true
+#            vb.memory = 1024
+#            vb.cpus = 2
+#        end
+#
+#        apigateway.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+#        apigateway.vm.provision "shell", inline: $commonscript
+#        apigateway.vm.provision "shell", inline: $nodescript        
+#    end    
+#
+#    config.vm.define "clinic" do |clinic|
+#        clinic.vm.box = "debian/buster64"
+#        clinic.vm.hostname = "clinic"
+#        clinic.vm.network "private_network", ip: "192.168.10.15"
+#
+#        config.vm.provider "virtualbox" do |vb|
+#            vb.linked_clone = true
+#            vb.memory = 1024
+#            vb.cpus = 2
+#        end
+#
+#        clinic.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+#        clinic.vm.provision "shell", inline: $commonscript
+#        clinic.vm.provision "shell", inline: $nodescript        
+#    end    
+#
+#    config.vm.define "doctor" do |doctor|
+#        doctor.vm.box = "debian/buster64"
+#        doctor.vm.hostname = "doctor"
+#        doctor.vm.network "private_network", ip: "192.168.10.16"
+#
+#        config.vm.provider "virtualbox" do |vb|
+#            vb.linked_clone = true
+#            vb.memory = 1024
+#            vb.cpus = 2
+#        end
+#
+#        doctor.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+#        doctor.vm.provision "shell", inline: $commonscript
+#        doctor.vm.provision "shell", inline: $nodescript        
+#    end    
+#
+#    config.vm.define "riak" do |db|
+#        db.vm.box = "debian/buster64"
+#        db.vm.hostname = "riak"
+#        db.vm.network "private_network", ip: "192.168.10.17"
+#
+#        config.vm.provider "virtualbox" do |vb|
+#            vb.linked_clone = true
+#            vb.memory = 1024
+#            vb.cpus = 2
+#        end
+#
+#        db.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
+#        db.vm.provision "shell", inline: $commonscript
+#        db.vm.provision "shell", inline: $nodescript        
+#    end    
+#  end
   

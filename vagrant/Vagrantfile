@@ -3,27 +3,10 @@
 
 # Multi-Machine Environment mimicking production environment using Vagrant
 
-$commonscript = <<-SCRIPT
+$controllerscript = <<-script
     sudo apt update -y
-    sudo echo "192.168.10.11   ansjenkins     jenkins_ansible_master" >> /etc/hosts
-    sudo echo "192.168.10.12   loadbalancer   loadbalancer" >> /etc/hosts
-    sudo echo "192.168.10.13   webserver      webserver" >> /etc/hosts
-    sudo echo "192.168.10.14   apigateway     apigateway" >> /etc/hosts
-    sudo echo "192.168.10.15   clinic         clinic" >> /etc/hosts
-    sudo echo "192.168.10.16   doctor         doctor" >> /etc/hosts
-    sudo echo "192.168.10.17   riak           riak" >> /etc/hosts
-SCRIPT
-
-$masterscript = <<-SCRIPT
-    sudo apt install ansible -y 
-    sudo apt install git -y
-    git clone https://github.com/srikanthkakumanu/devops.git
-SCRIPT
-
-$nodescript = <<-SCRIPT
-    cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
-    sudo rm -r /home/vagrant/.ssh/id_rsa.pub 
-SCRIPT
+    sudo apt install -y ansible 
+script
 
 class Configurator 
     # Defines Vagrant Box with given box name, host name, ip address
@@ -31,7 +14,6 @@ class Configurator
         vm.box = os
         vm.hostname = host
         vm.network "private_network", ip: ip
-        vm.provision "shell", inline: $commonscript    
     end
     # Defines VM settings such as cloning, memory, no.of CPUs
     def self.settings(vb, clone, memory, cpus)
@@ -40,42 +22,37 @@ class Configurator
         vb.cpus = cpus
     end
     # Box Provisions based on condition
-    def self.provision(vm, isMaster)
-        if isMaster == true
-            vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
-            vm.provision "shell", inline: $masterscript
-        else
-            vm.provision "shell", inline: $nodescript
+    def self.provision(vm, isController)
+        if isController == true
+            vm.provision "shell", inline: $controllerscript
         end
     end
 end
 
 Vagrant.configure("2") do |config|
 
-    config.vm.define "jenkins_ansible_master" do |ansjenkins|
-        Configurator.box(ansjenkins.vm, "debian/buster64", "ansjenkins", "192.168.10.11")
+    config.vm.define "controller" do |controller|
+        Configurator.box(controller.vm, "debian/buster64", "controller", "192.168.10.11")
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        Configurator.provision(ansjenkins.vm, true)
+        Configurator.provision(controller.vm, true)
     end    
 
-    config.vm.define "loadbalancer" do |loadbalancer|
-        Configurator.box(loadbalancer.vm, "debian/buster64", "loadbalancer", "192.168.10.12")
+    config.vm.define "lb" do |lb|
+        Configurator.box(lb.vm, "debian/buster64", "lb", "192.168.10.12")
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        loadbalancer.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        Configurator.provision(loadbalancer.vm, false)       
+        Configurator.provision(lb.vm, false)       
     end    
 
-    config.vm.define "webserver" do |webserver|
-        Configurator.box(webserver.vm, "debian/buster64", "webserver", "192.168.10.13")
+    config.vm.define "webapp" do |webapp|
+        Configurator.box(webapp.vm, "debian/buster64", "webapp", "192.168.10.13")
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        webserver.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        Configurator.provision(webserver.vm, false)       
+        Configurator.provision(webapp.vm, false)       
     end    
 
     config.vm.define "apigateway" do |apigateway|
@@ -83,7 +60,6 @@ Vagrant.configure("2") do |config|
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        apigateway.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
         Configurator.provision(apigateway.vm, false)       
     end    
 
@@ -92,7 +68,6 @@ Vagrant.configure("2") do |config|
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        clinic.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
         Configurator.provision(clinic.vm, false)       
     end    
 
@@ -101,7 +76,6 @@ Vagrant.configure("2") do |config|
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        doctor.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
         Configurator.provision(doctor.vm, false)       
     end    
 
@@ -110,9 +84,7 @@ Vagrant.configure("2") do |config|
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        db.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
         Configurator.provision(db.vm, false)       
     end    
-    config.ssh.insert_key = false
   end
   

@@ -1,10 +1,39 @@
 ---
-  - hosts: all
-    become: yes
-    become_method: sudo
-    become_user: root
-    tasks:
-      - name: Install basic software packages
-        apt: pkg=tree,git,curl state=present
+- hosts: all
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+    - group:
+        name: devops
+        state: present
+    
+    - name: create devops user with admin privileges
+      user: 
+        name: devops
+        comment: "DevOps User"
+        uid: 2001
+        group: devops
+    
+    - name: install htop package
+      action: apt name=htop state=present update_cache=yes
 
+- hosts: lb
+  user: vagrant
+  sudo: yes
+  tasks:
+    - name: install pre-requisite packages for nginx
+      apt: pkg=tree,curl,gnupg2,ca-certificates,lsb-release state=present
 
+    - name: add official nginx repository
+      apt_repository:
+        repo: "deb http://nginx.org/packages/debian `lsb_release -cs` nginx"
+    
+    - name: install nginx web server and ensure its at the latest version
+      apt:
+        name: nginx
+        state: latest
+    
+    - name: start nginx service
+      service: 
+        name: nginx
+        state: started
