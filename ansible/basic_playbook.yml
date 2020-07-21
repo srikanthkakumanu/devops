@@ -5,11 +5,12 @@
   become_method: sudo
   become_user: root
   tasks:
-    - group:
+    - name: create devops group 
+      group:
         name: devops
         state: present
     
-    - name: create devops user with admin privileges
+    - name: create devops user with admin privileges and assign to devops group
       user: 
         name: devops
         comment: "DevOps User"
