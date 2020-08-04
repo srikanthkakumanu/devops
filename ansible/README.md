@@ -26,6 +26,8 @@ To execute shell commands in all nodes:
 
 `ansible webservers -m command -a "/sbin/reboot -t now"`
 
+`ansible lb -i hosts -m shell -a "cat /etc/passwd"`
+
 - **-i**: Indicates inventory i.e. hosts file where all host addresses of nodes are declared.
 - **-u**: User name to connect with node.
 - **-m**: Module i.e. shell command to execute in node.

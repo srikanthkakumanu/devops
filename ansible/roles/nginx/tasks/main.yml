@@ -43,11 +43,11 @@
 - name: Install nginx web server and ensure its at the latest version
   apt: 
     name: nginx 
-    state: latest 
+    state: present 
     update_cache: true
-  when: not st.stat.exists
+#  when: not st.stat.exists
 
 - name: start nginx service
   service: 
     name: nginx
-    state: started
+    state: restarted
