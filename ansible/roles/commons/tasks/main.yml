@@ -1,0 +1,16 @@
+---
+# tasks file for common
+- name: create devops group 
+  group:
+    name: devops
+    state: present
+    
+- name: create devops user with admin privileges and assign to devops group
+  user: 
+    name: devops
+    comment: "DevOps User"
+    uid: 2001
+    group: devops
+    
+- name: install other basic packages
+  action: apt name=tree, curl, htop state=present update_cache=yes

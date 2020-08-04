@@ -1,0 +1,52 @@
+---
+- hosts: all
+  remote_user: vagrant
+  become: yes
+  become_method: sudo
+  become_user: root
+  roles: commons
+
+
+# - hosts: all
+#   remote_user: vagrant
+#   become: yes
+#   become_method: sudo
+#   become_user: root
+#   tasks:
+#     - name: create devops group 
+#       group:
+#         name: devops
+#         state: present
+    
+#     - name: create devops user with admin privileges and assign to devops group
+#       user: 
+#         name: devops
+#         comment: "DevOps User"
+#         uid: 2001
+#         group: devops
+    
+#     - name: install htop package
+#       action: apt name=htop state=present update_cache=yes
+
+# - hosts: lb
+#   user: vagrant
+#   become: yes
+#   become_method: sudo
+#   become_user: root
+#   tasks:
+#     - name: install pre-requisite packages for nginx
+#       apt: pkg=tree,curl,gnupg2,ca-certificates,lsb-release state=present
+
+#     # - name: add official nginx repository
+#     #   apt_repository:
+#     #     repo: "deb http://nginx.org/packages/debian buster nginx"
+    
+#     - name: install nginx web server and ensure its at the latest version
+#       apt:
+#         name: nginx
+#         state: latest
+    
+#     - name: start nginx service
+#       service: 
+#         name: nginx
+#         state: started

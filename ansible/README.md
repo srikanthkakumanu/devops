@@ -35,13 +35,25 @@ To execute Ansible playbook:
 
 `ansible-playbook -i hosts basic_playbook.yml`
 
+To create a role using ansible-galaxy:
+
+`ansible-galaxy init nginx .`
+
 # Playbook
 
 Playbooks are where we define Ansible's configuration, deployment with YAML convention. In short it is Ansible's scripting language. It consists one or more plays which map groups of hosts to well defined tasks. They can describe a policy you want your remote systems to enforce, or a set of steps in a general IT process. It tells Ansible what to execute. Ansible playbook contains list of ordered tasks i.e. steps which the user wants to execute on a particular machine and they run sequentially.
 
 # Role
 
-Role is a set of tasks and additional files to configure host to serve for a certain role. It is a way of automatically loading certain vars_files, tasks and handles based on a known file structure.
+A role enables the sharing and reuse of Ansible tasks. It contains Ansible playbook tasks, plus all the supporting files, variables, templates, and handlers needed to run the tasks. A role is a complete unit of automation that can be reused and shared.
+
+Role is a set of tasks and additional files to configure host to serve for a certain role. It is a way of automatically loading certain vars_files, tasks and handles based on a known file structure. 
+
+Roles provide a framework for fully independent, or interdependent collections of variables, tasks, files, templates, and modules. 
+
+In Ansible, the role is the primary mechanism for breaking a playbook into multiple files. This simplifies writing complex playbooks, and it makes them easier to reuse.
+
+
 
 # Tasks
 
