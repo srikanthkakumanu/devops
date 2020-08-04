@@ -13,4 +13,10 @@
     group: devops
     
 - name: install other basic packages
-  action: apt name=tree, curl, htop state=present update_cache=yes
+  apt: 
+    pkg:
+      - tree
+      - curl
+      - htop 
+    state: present
+    update_cache: yes
