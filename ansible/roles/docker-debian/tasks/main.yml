@@ -32,8 +32,9 @@
     update_cache: yes 
     name: docker-ce 
     state: latest
-  
-- name: actually install docker
-  apt:
-    name: "docker-ce"
-    state: latest    
+
+- name: Ensure docker-compose is installed and available
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.22.0/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
+    dest: /usr/local/bin/docker-compose
+    mode: 'u+x,g+x'
