@@ -37,10 +37,10 @@
   pip:
     name: docker
   
-- name: Pull default Docker image
-  docker_image:
-    name: "debian"
-    source: pull
+# - name: Pull default Docker image
+#   docker_image:
+#     name: "debian"
+#     source: pull
   
 # Creates the number of containers defined by the variable create_containers, using values from vars file
 - name: Create default containers
