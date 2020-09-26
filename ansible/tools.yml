@@ -1,7 +1,7 @@
-- hosts: stacky
+- hosts: tools
   user: vagrant
   become: yes
   become_method: sudo
   become_user: root
   roles: 
-   - nginx
+   - docker-debian

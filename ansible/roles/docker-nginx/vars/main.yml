@@ -1,0 +1,10 @@
+vars:
+  CTOP_VERSION: "0.7.3" # CTOP is an open source tool for docker container metrics
+  DOCKER_COMPOSE_VERSION: "1.26.2"
+  DOCKER_PACKAGES:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+  USER: "devops"

@@ -47,12 +47,12 @@ Vagrant.configure("2") do |config|
         Configurator.provision(controller.vm, true)
     end    
 
-    config.vm.define "stacky" do |lb|
-        Configurator.box(lb.vm, "debian/buster64", "lb", "192.168.10.12")
+    config.vm.define "tools" do |tools|
+        Configurator.box(tools.vm, "debian/buster64", "tools", "192.168.10.12")
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        Configurator.provision(lb.vm, false)       
+        Configurator.provision(tools.vm, false)       
     end    
 
 #     config.vm.define "webapp" do |webapp|
