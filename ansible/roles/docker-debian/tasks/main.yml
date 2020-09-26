@@ -33,22 +33,7 @@
     name: docker-ce 
     state: latest
   
-- name: Install Docker Module for Python
-  pip:
-    name: docker
-  
-# - name: Pull default Docker image
-#   docker_image:
-#     name: "debian"
-#     source: pull
-  
-# Creates the number of containers defined by the variable create_containers, using values from vars file
-- name: Create default containers
-  docker_container:
-    name: "docker"
-    image: "debian"
-    command: "sleep 1d"
-    state: present
-  with_sequence: count=4
-
-    
+- name: actually install docker
+  apt:
+    name: "docker-ce"
+    state: latest    
