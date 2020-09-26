@@ -39,16 +39,16 @@
   
 - name: Pull default Docker image
   docker_image:
-    name: "{{ default_container_image }}"
+    name: "debian"
     source: pull
   
 # Creates the number of containers defined by the variable create_containers, using values from vars file
 - name: Create default containers
   docker_container:
-    name: "{{ default_container_name }}{{ item }}"
-    image: "{{ default_container_image }}"
-    command: "{{ default_container_command }}"
+    name: "docker"
+    image: "debian"
+    command: "sleep 1d"
     state: present
-  with_sequence: count={{ create_containers }}
+  with_sequence: count=4
 
     
