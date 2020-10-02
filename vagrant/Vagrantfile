@@ -27,7 +27,9 @@ class Configurator
     def self.provision(vm, isController)
         if isController == true
             vm.provision "shell", inline: $controllerscript
-            vm.provision "file", source: "~/.ssh/id_rsa", destination: "/vagrant/insecure_private_key"
+#            vm.provision "file", source: "~/.ssh/id_rsa", destination: "/vagrant/insecure_private_key"
+            vm.provision "file", source: "~/.ssh/id_rsa", destination: "/.ssh/id_rsa"
+            vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/.ssh/id_rsa.pub"
         else
             vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
         end

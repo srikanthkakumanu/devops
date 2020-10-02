@@ -20,9 +20,13 @@ To execute shell commands in all nodes:
 
 `ansible -m ping all`
 
+`ansible -i hosts -m ping all`
+
 `ansible lb -i hosts -u vagrant -m setup`
 
 `ansible -i hosts -m setup all`
+
+`ssh -i /vagrant/insecure_private_key 192.168.10.12`
 
 `ansible webservers -m command -a "/sbin/reboot -t now"`
 
