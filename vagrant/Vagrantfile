@@ -2,9 +2,6 @@
 # vi: set ft=ruby :
 
 # Multi-Machine Environment mimicking production environment using Vagrant
-$copyPublicKey = <<-script
-    cat ~/.ssh/id_rsa.pub | ssh vagrant@192.168.10.11 -p 2222 'cat >> ~/.ssh/authorized_keys'
-script
 
 $controllerscript = <<-script
     sudo apt update -y
@@ -30,10 +27,7 @@ class Configurator
     def self.provision(vm, isController)
         if isController == true
             vm.provision "shell", inline: $controllerscript
-            vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
             vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
-        else
-            vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
         end
     end
 end
@@ -41,6 +35,8 @@ end
 Vagrant.configure("2") do |config|
 
     # Configuring own SSH Key
+    config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+    config.ssh.private_key_path = ["~/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
     config.ssh.insert_key = false
 
     config.vm.define "controller" do |controller|
@@ -56,18 +52,13 @@ Vagrant.configure("2") do |config|
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        Configurator.provision(tools.vm, false)       
     end    
-
-    config.vm.provision "shell", inline: $copyPublicKey
-    # config.ssh.private_key_path = "~/.ssh/id_rsa" 
 
 #     config.vm.define "webapp" do |webapp|
 #         Configurator.box(webapp.vm, "debian/buster64", "webapp", "192.168.10.13")
 #         config.vm.provider "virtualbox" do |vb|
 #             Configurator.settings(vb, true, 1024, 2)
 #         end
-#         Configurator.provision(webapp.vm, false)       
 #     end    
 
 #     config.vm.define "apigateway" do |apigateway|
@@ -75,7 +66,6 @@ Vagrant.configure("2") do |config|
 #         config.vm.provider "virtualbox" do |vb|
 #             Configurator.settings(vb, true, 1024, 2)
 #         end
-#         Configurator.provision(apigateway.vm, false)       
 #     end    
 
 #     config.vm.define "clinic" do |clinic|
@@ -83,7 +73,6 @@ Vagrant.configure("2") do |config|
 #         config.vm.provider "virtualbox" do |vb|
 #             Configurator.settings(vb, true, 1024, 2)
 #         end
-#         Configurator.provision(clinic.vm, false)       
 #     end    
 
 #     config.vm.define "doctor" do |doctor|
@@ -91,7 +80,6 @@ Vagrant.configure("2") do |config|
 #         config.vm.provider "virtualbox" do |vb|
 #             Configurator.settings(vb, true, 1024, 2)
 #         end
-#         Configurator.provision(doctor.vm, false)       
 #     end    
 
 #     config.vm.define "riak" do |db|
@@ -99,7 +87,6 @@ Vagrant.configure("2") do |config|
 #         config.vm.provider "virtualbox" do |vb|
 #             Configurator.settings(vb, true, 1024, 2)
 #         end
-#         Configurator.provision(db.vm, false)       
 #     end    
    end
   
