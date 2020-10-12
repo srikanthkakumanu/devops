@@ -7,8 +7,8 @@
     
 - name: create devops user with admin privileges and assign to devops group
   user: 
-    name: devops
-    password: devops
+    name: "devops"
+    password: "devops"
     comment: "DevOps User"
     uid: 2001
     group: devops

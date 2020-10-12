@@ -77,11 +77,11 @@
 
 - name: Test Docker with Hello-World example
   shell: "docker run hello-world"
-  register: hell_world_output
+  register: hello_world_output
 
 - name: Show output of hello word example
   debug:
-    msg: "Container Output: {{hello_world_output.stdout}}"
+    msg: "Container Output: {{ hello_world_output.stdout }}"
 
 - name: Create docker group
   group:
