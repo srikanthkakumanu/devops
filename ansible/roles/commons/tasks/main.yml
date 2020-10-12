@@ -6,6 +6,7 @@
     state: present
     
 - name: create devops user with admin privileges and assign to devops group
+  become: true
   user: 
     name: "devops"
     password: "devops"
@@ -19,3 +20,4 @@
       - tree
       - curl
       - htop 
+      - sudo
