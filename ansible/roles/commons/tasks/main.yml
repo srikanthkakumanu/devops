@@ -21,3 +21,4 @@
       - curl
       - htop 
       - sudo
+      - git
