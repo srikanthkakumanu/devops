@@ -1,0 +1,9 @@
+---
+- name: Create Jenkins docker container
+  docker_container:
+    name: jenkins
+    state: started
+    image: jenkins/jenkins:lts
+    pull: true
+    ports:
+      - "8001:8080"
