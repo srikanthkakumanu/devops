@@ -14,7 +14,10 @@
     comment: "DevOps User"
     uid: 2001
     group: devops
-    groups: sudo, devops
+    groups: 
+      - sudo
+      - devops
+    state: present
     
 - name: install other basic packages
   apt: 
