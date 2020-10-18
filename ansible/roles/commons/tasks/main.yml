@@ -1,7 +1,7 @@
 ---
 # tasks file for common
 - name: create devops group
-  gid: 2010
+  become: true
   group:
     name: devops
     state: present
