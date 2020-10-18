@@ -1,7 +1,7 @@
 ---
 - name: Add JDK 15 Repository
   apt_repository:
-    repo: 'ppa:webupd8team/java'
+    repo: 'ppa:linuxuprising/java'
 
 - name: Update APT packages
   apt:
