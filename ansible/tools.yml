@@ -6,6 +6,7 @@
   become_user: root
   roles: 
    - docker-debian
+   - oracleJDK
    - jenkins
   
   
