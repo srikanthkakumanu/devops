@@ -1,43 +1,20 @@
----
-- name: Add JDK 15 Repository
-  apt_repository:
-    repo: 'ppa:linuxuprising/java'
+- name: add repo for java 8
+  apt_repository: 
+    repo: 'ppa:webupd8team/java' 
+    state: present
 
-- name: Update APT packages
-  apt:
-    update_cache: yes
-    force_apt_get: yes
+- name: set licence selected
+  debconf: 
+    name: 'oracle-java8-installer' 
+    question: 'shared/accepted-oracle-license-v1-1' 
+    value: 'true' 
+    vtype: 'select'
+  sudo: yes
 
-- name: Agree to Oracle License
-  debconf:
-    name: oracle-jdk15-installer
-    question: shared/accepted-oracle-license-v1-1
-    vtype: select
-    value: "true"
-
-- name: Install JDK 15
-  apt:
-    name: oracle-jdk15-installer
+- name: install java 8
+  apt: 
+    name: oracle-java8-installer 
+    state: latest 
+    update-cache: yes 
     force: yes
-
-
-
-# - name: Install add-apt-repostory
-#   become: yes
-#   apt: name=software-properties-common state=latest
-
-# - name: Add Oracle Java Repository
-#   become: yes
-#   apt_repository: repo='ppa:webupd8team/java'
-
-# - name: Accept Java 8 License
-#   become: yes
-#   debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
-
-# - name: Install Oracle Java 8
-#   become: yes
-#   apt: name={{item}} state=latest
-#   with_items:
-#     - oracle-java8-installer
-#     - ca-certificates
-#     - oracle-java8-set-default
+  sudo: yes
