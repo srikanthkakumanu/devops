@@ -1,0 +1,28 @@
+- name: Get Open JDK TAR ball
+  get_url:
+    url: https://download.java.net/java/GA/jdk15.0.1/51f4f36ad4ef43e39d0dfdbaf6549e32/9/GPL/openjdk-15.0.1_linux-x64_bin.tar.gz
+    dest: /etc/open-jdk15.tar.gz
+
+- name: Make JAVA 15 Directory
+  file:
+    path: /usr/lib/java15
+    state: directory
+
+- name: Unpack TAR ball
+  unarchive:
+    dest: /usr/lib/java15
+    src: /etc/open-jdk15.tar.gz
+    remote_src: yes
+
+- name: Update Alternatives for JAVA
+  alternatives:
+    name: java
+    path: /usr/lib/java15/jdk-15.0.1/bin/java
+    link: /usr/bin/java
+    priority: 20000
+
+- name: Set JAVA_HOME Environment variable
+  blockinfile:
+    insertafter: EOF
+    path: /etc/environment
+    block: export JAVA_HOME=/usr/lib/java15/jdk-15.0.1
