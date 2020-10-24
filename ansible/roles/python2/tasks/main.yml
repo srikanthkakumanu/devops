@@ -1,0 +1,6 @@
+---
+- name: Install python2 && pip
+  apt: 
+   pkg:
+     - python2
+     - pip
