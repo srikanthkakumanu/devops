@@ -79,7 +79,7 @@
 
 - name: Reboot server in order for changes to take place
   reboot:
-    post_reboot_delay: 30
+    post_reboot_delay: 20
     test_command: uptime
 
 # - name: Install aptitude using apt
