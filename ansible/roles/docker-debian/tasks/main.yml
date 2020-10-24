@@ -28,9 +28,21 @@
     update_cache: yes
     force_apt_get: yes
 
-- name: Install Docker
+- name: Install Docker CE
   apt:
     name: docker-ce
+    state: present
+    force_apt_get: yes
+
+- name: Install Docker CE Client
+  apt:
+    name: docker-ce-cli
+    state: present
+    force_apt_get: yes
+
+- name: Install containerd.io
+  apt:
+    name: containerd.io
     state: present
     force_apt_get: yes
 
