@@ -12,7 +12,6 @@
       - ca-certificates
       - gnupg-agent
       - software-properties-common
-      - python-software-properties
 
 - name: Add Docker GPG apt key
   apt_key: 
