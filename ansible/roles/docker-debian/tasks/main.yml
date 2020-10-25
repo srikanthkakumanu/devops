@@ -12,9 +12,9 @@
       - ca-certificates
       - gnupg-agent
       - software-properties-common
-      - python-pip
+      - python3-pip
       - virtualenv
-      - python-setuptools
+      - python3-setuptools
 
 - name: Add Docker GPG apt key
   apt_key: 
