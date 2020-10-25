@@ -37,7 +37,7 @@
     state: present
     force_apt_get: yes
 
-- name: Install Docker CE
+- name: Install Docker using pip
   pip:
     name: docker
     # state: present
