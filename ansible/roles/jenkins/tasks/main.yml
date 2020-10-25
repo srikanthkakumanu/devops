@@ -17,6 +17,10 @@
     update_cache: yes
     force_apt_get: yes
 
+- name: Update pip3 packages
+  pip3:
+    update_cache: yes
+
 - name: Pull official Jenkins image and create Jenkins container
   become: true
   docker_container:
