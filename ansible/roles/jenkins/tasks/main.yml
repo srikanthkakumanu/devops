@@ -21,13 +21,15 @@
   become: true
   docker_container:
     name: jenkins-server
-    state: present
+    state: started
     image: jenkins/jenkins:latest
     pull: true
     volumes:
       - "/share/jenkins:/var/jenkins_home"
+    exposed_ports:
+        - "8080"
     ports:
-      - "8001:8080"
+      - "8080:8080"
       - "50000:50000"
 
 # - name: Pull latest official Jenkins Docker image
