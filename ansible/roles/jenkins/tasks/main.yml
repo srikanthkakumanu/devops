@@ -21,7 +21,7 @@
   become: true
   docker_container:
     name: jenkins-server
-    state: started
+    state: present
     image: jenkins/jenkins:latest
     pull: true
     volumes:
