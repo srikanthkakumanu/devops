@@ -12,6 +12,9 @@
       - ca-certificates
       - gnupg-agent
       - software-properties-common
+      - python-pip
+      - virtualenv
+      - python-setuptools
 
 - name: Add Docker GPG apt key
   apt_key: 
@@ -33,6 +36,12 @@
     name: docker-ce
     state: present
     force_apt_get: yes
+
+- name: Install Docker CE
+  pip:
+    name: docker
+    # state: present
+    # force_apt_get: yes
 
 - name: Install Docker CE Client
   apt:
