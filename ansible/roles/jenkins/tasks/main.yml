@@ -26,7 +26,8 @@
     pull: true
     detach: yes
     volumes:
-      - "/share/jenkins:/var/jenkins_home"
+      - "jenkins_home:/var/jenkins_home"
+      # - "/share/jenkins:/var/jenkins_home"
     # exposed_ports:
     #     - "8080"
     ports:
