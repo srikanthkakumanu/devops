@@ -24,10 +24,11 @@
     state: started
     image: jenkins/jenkins:latest
     pull: true
+    detach: yes
     volumes:
       - "/share/jenkins:/var/jenkins_home"
-    exposed_ports:
-        - "8080"
+    # exposed_ports:
+    #     - "8080"
     ports:
       - "8080:8080"
       - "50000:50000"
