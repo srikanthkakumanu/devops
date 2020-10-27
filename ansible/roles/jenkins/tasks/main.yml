@@ -6,12 +6,6 @@
     group: devops
     state: directory
 
-# - name: Login to Docker Hub Registry
-#   docker_login:
-#     email: "srik1980@gmail.com"
-#     username: "srik1980"
-#     password: "Berlin123@"
-
 - name: Update APT packages
   apt:
     update_cache: yes
