@@ -5,6 +5,7 @@
     owner: devops
     group: devops
     state: directory
+    mode: 0777
 
 - name: Update APT packages
   apt:
