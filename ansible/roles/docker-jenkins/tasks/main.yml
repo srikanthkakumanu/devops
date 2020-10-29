@@ -1,0 +1,70 @@
+---
+- name: Ensure jenkins directory on docker host
+  file:
+    path: /share/jenkins
+    owner: devops
+    group: devops
+    state: directory
+    mode: 0777
+
+- name: Update APT packages
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+
+- name: Pull official Jenkins image and create Jenkins container
+  become: true
+  become_user: root
+  become_method: sudo
+  docker_container:
+    name: jenkins-server
+    state: started
+    image: jenkins/jenkins:lts
+    pull: true
+    detach: yes
+    volumes:
+      - "/share/jenkins:/var/jenkins_home:rw"
+    ports:
+      - "8001:8080"
+      - "50000:50000"
+
+# - name: Read Jenkins Initial Admin Password
+#   shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+#   register: adminpwd
+
+# - name: Unlock and Add Admin User i.e jenkins
+#   jenkins_script:
+#   script: |
+#     import jenkins.model.*
+#     import hudson.security.*
+#     def instance = Jenkins.getInstance()
+#     def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+#     hudsonRealm.createAccount('jenkins', 'jenkins')
+#     instance.setSecurityRealm(hudsonRealm)
+#     def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+#     strategy.setAllowAnonymousRead(false)
+#     instance.setAuthorizationStrategy(strategy)
+#     instance.save()
+#     args:
+#      user_pwd: "{{ admin_user_pass }}"
+#      user: admin
+#      password: "{{ adminpwd.stdout }}"
+
+# - name: complete setup wizard
+#   jenkins_script:
+#   script: |
+#     import static jenkins.model.Jenkins.instance as jenkins
+#     import jenkins.install.InstallState
+#     if (!jenkins.installState.isSetupComplete()) {
+#       InstallState.INITIAL_SETUP_COMPLETED.initializeState()
+#     }
+#     user: admin
+#     password: "{{ adminpwd.stdout }}"
+
+# - name: install plugin
+#   jenkins_plugin:
+#     name: "{{ item }}"
+#     state: latest
+#     url_username: admin
+#     url_password: "{{ adminpwd.stdout }}"
+#     with_items: "{{ jenkins_plugins }}"

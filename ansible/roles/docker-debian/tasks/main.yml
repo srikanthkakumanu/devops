@@ -98,5 +98,5 @@
 
 - name: Reboot server in order for changes to take place
   reboot:
-    post_reboot_delay: 20
+    post_reboot_delay: 10
     test_command: uptime

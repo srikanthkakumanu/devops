@@ -2,4 +2,6 @@
 ./backup/*
 ./vagrant
 ./vagrant/*
+./todo.txt
+
 

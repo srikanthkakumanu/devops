@@ -7,6 +7,6 @@
   roles: 
    - docker-debian
    - openJDK
-   - jenkins
+   - docker-jenkins
   
   
