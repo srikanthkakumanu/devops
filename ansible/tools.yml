@@ -8,5 +8,6 @@
    - docker-debian
    - openJDK
    - docker-jenkins
+   - docker-nginx
   
   
