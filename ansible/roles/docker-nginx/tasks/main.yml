@@ -26,6 +26,7 @@
     volumes:
       - "/share/nginx:/var/nginx_home:rw"
       - "/share/nginx/html:/usr/share/nginx/html:rw" # Hosting simple static content
+      - "share/nginx:/etc/nginx:rw" 
       - "/share/nginx/nginx.conf:/etc/nginx/nginx.conf:rw" # Hosting complex configuration
     ports:
       - "8002:8080"
