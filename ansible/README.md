@@ -40,6 +40,7 @@ To execute shell commands in all nodes:
 To execute Ansible playbook:
 
 `ansible-playbook -i hosts basic_playbook.yml`
+`ansible-playbook -i devops/ansible/hosts devops/ansible/site.yml`
 
 To create a role using ansible-galaxy:
 
@@ -114,3 +115,10 @@ or
           service:
             name: httpd
             state: restarted
+
+## Important commands
+
+To Login to a particular docker container which is running, use the below command:
+
+`docker exec -it <container name> /bin/bash`
+
