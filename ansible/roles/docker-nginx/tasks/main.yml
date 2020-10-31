@@ -1,0 +1,83 @@
+---
+# tasks file for nginx
+- name: Ensure nginx directory on docker host
+  file:
+    path: /share/nginx
+    owner: devops
+    group: devops
+    state: directory
+    mode: 0777
+
+- name: Update APT packages
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+
+- name: Pull official NGINX image and create docker container
+  become: true
+  become_user: root
+  become_method: sudo
+  docker_container:
+    name: nginx-server
+    state: started
+    image: nginx:latest
+    pull: true
+    detach: yes
+    volumes:
+      - "/share/nginx:/var/nginx_home:rw"
+      - "/share/nginx/html:/usr/share/nginx/html:rw" # Hosting simple static content
+      - "/share/nginx/nginx.conf:/etc/nginx/nginx.conf:rw" # Hosting complex configuration
+    ports:
+      - "8001:8080"
+
+# - name: install pre-requisite packages for nginx
+#   apt:
+#     pkg:
+#       - gnupg2
+#       - ca-certificates
+#       - lsb-release
+
+# - name: Add nginx.list to sources
+#   template: 
+#     src: templates/nginx.list.j2 
+#     dest: /etc/apt/sources.list.d/nginx.list 
+#     owner: root 
+#     group: root 
+#     mode: 0644
+
+# - name: Download nginx stable apt key
+#   shell: curl -O http://nginx.org/keys/nginx_signing.key
+#   args:
+#     chdir: /tmp
+#     creates: nginx_signing.key
+
+# - name: Add nginx stable apt key
+#   apt_key:
+#     file: /tmp/nginx_signing.key
+#     state: present
+
+# - name: Update apt cache
+#   apt: 
+#     update_cache: yes
+
+# - name: Retrieve facts for nginx.conf file
+#   stat: 
+#     path: /etc/nginx/nginx.conf
+#   register: st
+
+# - name: Ensures nginx sites dir exists
+#   file: 
+#     path: /etc/nginx/sites-enabled 
+#     state: directory
+
+# - name: Install nginx web server and ensure its at the latest version
+#   apt: 
+#     name: nginx 
+#     state: present 
+#     update_cache: true
+# #  when: not st.stat.exists
+
+# - name: start nginx service
+#   service: 
+#     name: nginx
+#     state: restarted
