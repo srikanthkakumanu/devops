@@ -33,6 +33,7 @@
       - "/share/nginx/log:/var/log/nginx:rw" # NGINX logs
     ports:
       - "8080:8080"
+      - "443:443"
 
 # - name: install pre-requisite packages for nginx
 #   apt:
