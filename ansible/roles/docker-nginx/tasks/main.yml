@@ -32,7 +32,7 @@
       # - "/share/nginx/conf:/etc/nginx/conf.d/:rw" # Hosting complex configuration
       - "/share/nginx/log:/var/log/nginx:rw" # NGINX logs
     ports:
-      - "8002:8080"
+      - "8002:80"
       - "443:443"
 
 # - name: install pre-requisite packages for nginx
