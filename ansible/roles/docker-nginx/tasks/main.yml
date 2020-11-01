@@ -26,13 +26,13 @@
     pull: true
     detach: yes
     volumes:
-      - "/share/nginx:/etc/nginx:rw" 
-      - "/share/nginx/html:/usr/share/nginx/html:rw" # Hosting simple static content
-      - "/share/nginx/sites-enabled:/etc/nginx/sites-enabled:rw"
-      - "/share/nginx/conf:/etc/nginx/conf.d/:rw" # Hosting complex configuration
-      - "/share/nginx/log:/var/log/nginx:ro" # NGINX logs
+      # - "/share/nginx:/etc/nginx:rw" 
+      # - "/share/nginx/html:/usr/share/nginx/html:rw" # Hosting simple static content
+      # - "/share/nginx/sites-enabled:/etc/nginx/sites-enabled:rw"
+      # - "/share/nginx/conf:/etc/nginx/conf.d/:rw" # Hosting complex configuration
+      - "/share/nginx/log:/var/log/nginx:rw" # NGINX logs
     ports:
-      - "8002:8080"
+      - "8080:8080"
 
 # - name: install pre-requisite packages for nginx
 #   apt:
