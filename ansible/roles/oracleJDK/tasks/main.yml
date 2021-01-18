@@ -1,0 +1,33 @@
+- name: Get Oracle JDK TAR ball
+  become: yes
+  get_url:
+    url: https://download.oracle.com/otn-pub/java/jdk/15.0.1%2B9/51f4f36ad4ef43e39d0dfdbaf6549e32/jdk-15.0.1_linux-x64_bin.tar.gz
+    headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
+    dest: /etc/oracle-jdk15.tar.gz
+    checksum: sha256:445a1c5c335b53b030f68aca58493ddedd49f4b53085618bc1ae7aba68156606
+    validate_certs: false
+    mode: 0644
+    
+- name: Make JAVA 15 Directory
+  file:
+    path: /usr/lib/java15
+    state: directory
+
+- name: Unpack TAR ball
+  unarchive:
+    dest: /usr/lib/java15
+    src: /etc/oracle-jdk15.tar.gz
+    remote_src: yes
+
+- name: Update Alternatives for JAVA
+  alternatives:
+    name: java
+    path: /usr/lib/java15/jdk-15.0.1/bin/java
+    link: /usr/bin/java
+    priority: 20000
+
+- name: Set JAVA_HOME Environment variable
+  blockinfile:
+    insertafter: EOF
+    path: /etc/environment
+    block: export JAVA_HOME=/usr/lib/java15/jdk-15.0.1
