@@ -1,7 +1,3 @@
-./backup
-./backup/*
-./vagrant
-./vagrant/*
+
+vagrant/.vagrant
 ./todo.txt
-
-

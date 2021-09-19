@@ -1,0 +1,27 @@
+Software                Install             Setup                 
+--------                --------            --------
+Ansible                 Done
+Git                     Done
+Java                    Done
+Maven
+Gradle
+JUnit
+
+Nginx                   Done
+Jenkins                 Done
+Confluence
+Jira
+ServiceDesk
+newrelic
+SonarQube
+Selenium
+
+Nagios
+Splunk
+Sensu
+Prometheus
+ELK Stack
+Saltstack
+Grafana
+
+

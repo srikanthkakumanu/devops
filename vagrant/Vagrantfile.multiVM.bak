@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 # Multi-Machine Environment mimicking production environment using Vagrant
-
+# Sample example
 $commonscript = <<-SCRIPT
     sudo apt update -y
     sudo echo "192.168.10.11   ansjenkins     jenkins_ansible_master" >> /etc/hosts
@@ -15,23 +15,23 @@ $commonscript = <<-SCRIPT
 SCRIPT
 
 $masterscript = <<-SCRIPT
-    sudo apt install ansible -y 
+    sudo apt install ansible -y
     sudo apt install git -y
     git clone https://github.com/srikanthkakumanu/devops.git
 SCRIPT
 
 $nodescript = <<-SCRIPT
     cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
-    sudo rm -r /home/vagrant/.ssh/id_rsa.pub 
+    sudo rm -r /home/vagrant/.ssh/id_rsa.pub
 SCRIPT
 
-class Configurator 
+class Configurator
     # Defines Vagrant Box with given box name, host name, ip address
     def self.box(vm, os, host, ip)
         vm.box = os
         vm.hostname = host
         vm.network "private_network", ip: ip
-        vm.provision "shell", inline: $commonscript    
+        vm.provision "shell", inline: $commonscript
     end
     # Defines VM settings such as cloning, memory, no.of CPUs
     def self.settings(vb, clone, memory, cpus)
@@ -58,7 +58,7 @@ Vagrant.configure("2") do |config|
             Configurator.settings(vb, true, 1024, 2)
         end
         Configurator.provision(ansjenkins.vm, true)
-    end    
+    end
 
     config.vm.define "loadbalancer" do |loadbalancer|
         Configurator.box(loadbalancer.vm, "debian/buster64", "loadbalancer", "192.168.10.12")
@@ -66,8 +66,8 @@ Vagrant.configure("2") do |config|
             Configurator.settings(vb, true, 1024, 2)
         end
         loadbalancer.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        Configurator.provision(loadbalancer.vm, false)       
-    end    
+        Configurator.provision(loadbalancer.vm, false)
+    end
 
     config.vm.define "webserver" do |webserver|
         Configurator.box(webserver.vm, "debian/buster64", "webserver", "192.168.10.13")
@@ -75,8 +75,8 @@ Vagrant.configure("2") do |config|
             Configurator.settings(vb, true, 1024, 2)
         end
         webserver.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        Configurator.provision(webserver.vm, false)       
-    end    
+        Configurator.provision(webserver.vm, false)
+    end
 
     config.vm.define "apigateway" do |apigateway|
         Configurator.box(apigateway.vm, "debian/buster64", "apigateway", "192.168.10.14")
@@ -84,8 +84,8 @@ Vagrant.configure("2") do |config|
             Configurator.settings(vb, true, 1024, 2)
         end
         apigateway.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        Configurator.provision(apigateway.vm, false)       
-    end    
+        Configurator.provision(apigateway.vm, false)
+    end
 
     config.vm.define "clinic" do |clinic|
         Configurator.box(clinic.vm, "debian/buster64", "clinic", "192.168.10.15")
@@ -93,8 +93,8 @@ Vagrant.configure("2") do |config|
             Configurator.settings(vb, true, 1024, 2)
         end
         clinic.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        Configurator.provision(clinic.vm, false)       
-    end    
+        Configurator.provision(clinic.vm, false)
+    end
 
     config.vm.define "doctor" do |doctor|
         Configurator.box(doctor.vm, "debian/buster64", "doctor", "192.168.10.16")
@@ -102,8 +102,8 @@ Vagrant.configure("2") do |config|
             Configurator.settings(vb, true, 1024, 2)
         end
         doctor.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        Configurator.provision(doctor.vm, false)       
-    end    
+        Configurator.provision(doctor.vm, false)
+    end
 
     config.vm.define "riak" do |db|
         Configurator.box(db.vm, "debian/buster64", "riak", "192.168.10.17")
@@ -111,11 +111,11 @@ Vagrant.configure("2") do |config|
             Configurator.settings(vb, true, 1024, 2)
         end
         db.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
-        Configurator.provision(db.vm, false)       
-    end    
+        Configurator.provision(db.vm, false)
+    end
     config.ssh.insert_key = false
   end
-  
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 #
@@ -136,7 +136,7 @@ Vagrant.configure("2") do |config|
 #
 #$nodescript = <<-SCRIPT
 #    cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
-#    sudo rm -r /home/vagrant/.ssh/id_rsa.pub 
+#    sudo rm -r /home/vagrant/.ssh/id_rsa.pub
 #SCRIPT
 #
 #
@@ -147,7 +147,7 @@ Vagrant.configure("2") do |config|
 #        ansjenkins.vm.box = "debian/buster64"
 #        ansjenkins.vm.hostname = "ansjenkins"
 #        ansjenkins.vm.network "private_network", ip: "192.168.10.11"
-#        
+#
 #        config.vm.provider "virtualbox" do |vb|
 #            vb.linked_clone = true
 #            vb.memory = 1024
@@ -156,7 +156,7 @@ Vagrant.configure("2") do |config|
 #
 #        ansjenkins.vm.provision "shell", inline: $commonscript
 #        ansjenkins.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/"
-#    end    
+#    end
 #
 #    config.vm.define "loadbalancer" do |loadbalancer|
 #        loadbalancer.vm.box = "debian/buster64"
@@ -171,8 +171,8 @@ Vagrant.configure("2") do |config|
 #
 #        loadbalancer.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
 #        loadbalancer.vm.provision "shell", inline: $commonscript
-#        loadbalancer.vm.provision "shell", inline: $nodescript        
-#    end    
+#        loadbalancer.vm.provision "shell", inline: $nodescript
+#    end
 #
 #    config.vm.define "webserver" do |webserver|
 #        webserver.vm.box = "debian/buster64"
@@ -187,8 +187,8 @@ Vagrant.configure("2") do |config|
 #
 #        webserver.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
 #        webserver.vm.provision "shell", inline: $commonscript
-#        webserver.vm.provision "shell", inline: $nodescript        
-#    end    
+#        webserver.vm.provision "shell", inline: $nodescript
+#    end
 #
 #    config.vm.define "apigateway" do |apigateway|
 #        apigateway.vm.box = "debian/buster64"
@@ -203,8 +203,8 @@ Vagrant.configure("2") do |config|
 #
 #        apigateway.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
 #        apigateway.vm.provision "shell", inline: $commonscript
-#        apigateway.vm.provision "shell", inline: $nodescript        
-#    end    
+#        apigateway.vm.provision "shell", inline: $nodescript
+#    end
 #
 #    config.vm.define "clinic" do |clinic|
 #        clinic.vm.box = "debian/buster64"
@@ -219,8 +219,8 @@ Vagrant.configure("2") do |config|
 #
 #        clinic.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
 #        clinic.vm.provision "shell", inline: $commonscript
-#        clinic.vm.provision "shell", inline: $nodescript        
-#    end    
+#        clinic.vm.provision "shell", inline: $nodescript
+#    end
 #
 #    config.vm.define "doctor" do |doctor|
 #        doctor.vm.box = "debian/buster64"
@@ -235,8 +235,8 @@ Vagrant.configure("2") do |config|
 #
 #        doctor.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
 #        doctor.vm.provision "shell", inline: $commonscript
-#        doctor.vm.provision "shell", inline: $nodescript        
-#    end    
+#        doctor.vm.provision "shell", inline: $nodescript
+#    end
 #
 #    config.vm.define "riak" do |db|
 #        db.vm.box = "debian/buster64"
@@ -251,7 +251,6 @@ Vagrant.configure("2") do |config|
 #
 #        db.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/"
 #        db.vm.provision "shell", inline: $commonscript
-#        db.vm.provision "shell", inline: $nodescript        
-#    end    
+#        db.vm.provision "shell", inline: $nodescript
+#    end
 #  end
-  

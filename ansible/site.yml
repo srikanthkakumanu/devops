@@ -1,3 +1,0 @@
----
-- import_playbook: commons.yml 
-- import_playbook: tools.yml

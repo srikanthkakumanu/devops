@@ -1,14 +1,10 @@
-- hosts: tools
+- hosts: devserver
   strategy: debug
   user: vagrant
   become: yes
   become_method: sudo
   become_user: root
-  roles: 
+  roles:
    - docker-debian
-  # - openJDK
-   - oracleJDK
-   - docker-jenkins
-   - docker-nginx
-  
-  
+   - openJDK
+#   - oracleJDK

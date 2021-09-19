@@ -1,0 +1,17 @@
+[webloadbalancer]
+#192.168.10.111   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[jenkinserver]
+#192.168.10.112   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[devserver]
+#192.168.10.113   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[webapp]
+#192.168.10.114   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[apigateway]
+#192.168.10.115   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[riak]
+#192.168.10.116   ansible_ssh_user=vagrant   ansible_ssh_private_key_file=~/.ssh/id_rsa

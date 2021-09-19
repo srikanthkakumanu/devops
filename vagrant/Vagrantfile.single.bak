@@ -1,6 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-
+# Sample example
 Vagrant.configure("2") do |config|
 
   # Vagrant box setup with Operating System
@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
     vb.cpus = 2
 
   end
- 
+
   # Network Settings
   # guest is vagrant box and host is local machine
   # config.vm.network "forwarded_port", guest: 80, host: 8080
@@ -29,8 +29,8 @@ Vagrant.configure("2") do |config|
   # :mount_options: is used to set permissions
   # dmode: directory mode set to 777
   # fmode: file mode set to 666
-  # config.vm.synced_folder "./apache2/data", "/var/www/html", :nfs => {:mount_options => ["dmode=777", "fmode=666"]} 
-  # config.vm.synced_folder "./apache2/data", "/var/www/html" 
+  # config.vm.synced_folder "./apache2/data", "/var/www/html", :nfs => {:mount_options => ["dmode=777", "fmode=666"]}
+  # config.vm.synced_folder "./apache2/data", "/var/www/html"
 
 
   # Provision Settings
@@ -41,5 +41,5 @@ Vagrant.configure("2") do |config|
   SHELL
 
   # via Ansible
-  
+
 end

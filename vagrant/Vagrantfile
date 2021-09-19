@@ -1,13 +1,13 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Multi-Machine Environment mimicking production environment using Vagrant
-
-$controllerscript = <<-script
+# Multi-Machine Environment mimicking development environment using Vagrant
+# one machine for jenkins and another machine for setting-up CI/CD
+#     git clone https://github.com/srikanthkakumanu/devops.git
+$jenkins_setup = <<-script
     sudo apt update -y
-    sudo apt install -y ansible 
     sudo apt install -y git
-    git clone https://github.com/srikanthkakumanu/devops.git
+    sudo apt install -y ansible 
 script
 
 class Configurator 
@@ -24,9 +24,9 @@ class Configurator
         vb.cpus = cpus
     end
     # Box Provisions based on condition
-    def self.provision(vm, isController)
-        if isController == true
-            vm.provision "shell", inline: $controllerscript
+    def self.provision(vm, isJenkinsBox)
+        if isJenkinsBox == true
+            vm.provision "shell", inline: $jenkins_setup
             vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
         end
     end
@@ -38,55 +38,20 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
     config.ssh.private_key_path = ["~/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
     config.ssh.insert_key = false
-
-    config.vm.define "controller" do |controller|
-        Configurator.box(controller.vm, "debian/buster64", "controller", "192.168.10.11")
+    # Setting up Jenkins environment in one box
+    config.vm.define "jenkinserver" do |jenkinserver|
+        Configurator.box(jenkinserver.vm, "debian/buster64", "jenkinserver", "192.168.10.111")
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
-        Configurator.provision(controller.vm, true)
+        Configurator.provision(jenkinserver.vm, true)
     end    
-
-    config.vm.define "tools" do |tools|
-        Configurator.box(tools.vm, "debian/buster64", "tools", "192.168.10.12")
+    # Setting up Dev environment in another box with required tools such as Java, Spring framework, DB etc.
+    config.vm.define "devserver" do |devserver|
+        Configurator.box(devserver.vm, "debian/buster64", "devserver", "192.168.10.112")
         config.vm.provider "virtualbox" do |vb|
             Configurator.settings(vb, true, 1024, 2)
         end
     end    
-
-#     config.vm.define "webapp" do |webapp|
-#         Configurator.box(webapp.vm, "debian/buster64", "webapp", "192.168.10.13")
-#         config.vm.provider "virtualbox" do |vb|
-#             Configurator.settings(vb, true, 1024, 2)
-#         end
-#     end    
-
-#     config.vm.define "apigateway" do |apigateway|
-#         Configurator.box(apigateway.vm, "debian/buster64", "apigateway", "192.168.10.14")
-#         config.vm.provider "virtualbox" do |vb|
-#             Configurator.settings(vb, true, 1024, 2)
-#         end
-#     end    
-
-#     config.vm.define "clinic" do |clinic|
-#         Configurator.box(clinic.vm, "debian/buster64", "clinic", "192.168.10.15")
-#         config.vm.provider "virtualbox" do |vb|
-#             Configurator.settings(vb, true, 1024, 2)
-#         end
-#     end    
-
-#     config.vm.define "doctor" do |doctor|
-#         Configurator.box(doctor.vm, "debian/buster64", "doctor", "192.168.10.16")
-#         config.vm.provider "virtualbox" do |vb|
-#             Configurator.settings(vb, true, 1024, 2)
-#         end
-#     end    
-
-#     config.vm.define "riak" do |db|
-#         Configurator.box(db.vm, "debian/buster64", "riak", "192.168.10.17")
-#         config.vm.provider "virtualbox" do |vb|
-#             Configurator.settings(vb, true, 1024, 2)
-#         end
-#     end    
    end
   
