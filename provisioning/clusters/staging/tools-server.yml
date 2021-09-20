@@ -1,4 +1,4 @@
-- hosts: jenkinserver
+- hosts: toolsserver
   strategy: debug
   user: vagrant
   become: yes

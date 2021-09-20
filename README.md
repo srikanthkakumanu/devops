@@ -278,3 +278,21 @@ or
 - To install Jenkins server and dev server (using ansible): `ansible-playbook -i provisioning/clusters/dev/hosts dev-site.yml`
 - To know list of docker containers running in a box/machine: `docker ps`
 - To Login to a particular docker container which is running, use the below command: `docker exec -it <container name> /bin/bash` and e.g. `docker exec -it jenkins-server cat /var/jenkins_home/secrets/initialAdminPassword`
+- To start and stop docker container manually: `docker stop container-name` and `docker start container-name`
+
+## Setup Information
+
+Sandbox or Development environment contains two vagrant boxes:
+
+- tool box
+  - all common CLI tools
+  - open JDK
+  - Git
+  - Ansible
+  - jenkins docker image
+  - nexus docker image
+
+- dev box
+  - all common CLI tools
+  - open JDK
+  - microservice app(s)

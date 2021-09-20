@@ -1,0 +1,19 @@
+---
+ulimit_config_location: /etc/security/limits.conf
+# ulimit_config:
+#   - domain: '*'
+#     type: soft
+#     item: nofile
+#     value: 131072
+#   - domain: '*'
+#     type: hard
+#     item: nofile
+#     value: 131072
+#   - domain: '*'
+#     type: soft
+#     item: nproc
+#     value: 8192
+#   - domain: '*'
+#     type: hard
+#     item: nproc
+#     value: 8192

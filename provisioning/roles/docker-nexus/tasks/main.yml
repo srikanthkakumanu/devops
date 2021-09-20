@@ -1,0 +1,33 @@
+---
+- name: Ensure nexus directory on docker host
+  file:
+    path: /share/nexus
+    owner: devops
+    group: devops
+    state: directory
+    mode: 0777
+
+- name: Update APT packages
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+    # upgrade: yes
+    # cache_valid_time: 86400 #One day
+    
+# Caution: To run sonatype Nexus, it requires 8GB minimum
+- name: Pull official Sonatype Nexus image and create Nexus container
+  become: true
+  become_user: root
+  become_method: sudo
+  docker_container:
+    name: nexus-server
+    state: started
+    image: sonatype/nexus3:3.34.0
+    pull: true
+    detach: yes
+    volumes:
+      - "/share/nexus:/opt/sonatype/nexus:rw"
+      - "/share/nexus-data:/nexus-data:rw"
+    ports:
+      - "8002:8081"
+      #- "50001:50000"

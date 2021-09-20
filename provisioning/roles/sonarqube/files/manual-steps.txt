@@ -1,0 +1,14 @@
+Post Installation of PostgreSQL - Setup of Users, password, privileges manually
+-------------------------------------------------------------------------------
+1. Change default password for postgres user:
+    - $ sudo passwd postgres
+    - Then it will prompt you to enter new password
+2. Login as postgres user with new password:
+    - $ su - postgres
+3. Login to postgresql CLI: $ psql
+4. Execute the below commands:
+    - $ create database sonarqubedb;
+    - $ create user sonarqube with encrypted password 'your strong password';
+    - $ grant all privileges on database sonarqubedb to sonarqube
+    - $ \q
+    - $ exit

@@ -4,13 +4,13 @@
 # Multi-Machine Environment mimicking development environment using Vagrant
 # one machine for jenkins and another machine for setting-up CI/CD
 #     git clone https://github.com/srikanthkakumanu/devops.git
-$jenkins_setup = <<-script
+$toolbox_setup = <<-script
     sudo apt update -y
     sudo apt install -y git
-    sudo apt install -y ansible 
+    sudo apt install -y ansible
 script
 
-class Configurator 
+class Configurator
     # Defines Vagrant Box with given box name, host name, ip address
     def self.box(vm, os, host, ip)
         vm.box = os
@@ -24,9 +24,9 @@ class Configurator
         vb.cpus = cpus
     end
     # Box Provisions based on condition
-    def self.provision(vm, isJenkinsBox)
-        if isJenkinsBox == true
-            vm.provision "shell", inline: $jenkins_setup
+    def self.provision(vm, isToolBox)
+        if isToolBox == true
+            vm.provision "shell", inline: $toolbox_setup
             vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
         end
     end
@@ -39,19 +39,18 @@ Vagrant.configure("2") do |config|
     config.ssh.private_key_path = ["~/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
     config.ssh.insert_key = false
     # Setting up Jenkins environment in one box
-    config.vm.define "jenkinserver" do |jenkinserver|
-        Configurator.box(jenkinserver.vm, "debian/buster64", "jenkinserver", "192.168.10.111")
+    config.vm.define "toolbox" do |toolbox|
+        Configurator.box(toolbox.vm, "debian/buster64", "toolbox", "192.168.10.111")
         config.vm.provider "virtualbox" do |vb|
-            Configurator.settings(vb, true, 1024, 2)
+            Configurator.settings(vb, true, 6114, 2)
         end
-        Configurator.provision(jenkinserver.vm, true)
-    end    
+        Configurator.provision(toolbox.vm, true)
+    end
     # Setting up Dev environment in another box with required tools such as Java, Spring framework, DB etc.
-    config.vm.define "devserver" do |devserver|
-        Configurator.box(devserver.vm, "debian/buster64", "devserver", "192.168.10.112")
+    config.vm.define "devbox" do |devbox|
+        Configurator.box(devbox.vm, "debian/buster64", "devbox", "192.168.10.112")
         config.vm.provider "virtualbox" do |vb|
-            Configurator.settings(vb, true, 1024, 2)
+            Configurator.settings(vb, true, 2048, 2)
         end
-    end    
+    end
    end
-  

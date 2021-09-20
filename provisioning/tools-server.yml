@@ -1,4 +1,4 @@
-- hosts: jenkinserver
+- hosts: tools
   strategy: debug
   user: vagrant
   become: yes
@@ -9,3 +9,6 @@
   #  - openJDK
     - docker-jenkins
     - gradle
+    - sonarqube
+  # Caution: Nexus requires 8GB minimum
+  #  - docker-nexus
