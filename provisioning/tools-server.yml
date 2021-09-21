@@ -6,9 +6,9 @@
   become_user: root
   roles:
   #  - docker-debian
-  #  - openJDK
+    - openJDK
     - docker-jenkins
     - gradle
-    - sonarqube
-  # Caution: Nexus requires 8GB minimum
+# Caution: Nexus requires 8GB minimum and Sonarqube requires more memory
+  #  - sonarqube
   #  - docker-nexus

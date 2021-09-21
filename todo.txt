@@ -1,11 +1,11 @@
-Software                Install             Setup                 
+Software                Install             Setup
 --------                --------            --------
 Ansible                 Done
 Git                     Done
 Java                    Done
-Maven
-Gradle
-JUnit
+Maven                   Done
+Gradle                  Done
+JUnit                   Done
 
 Nginx                   Done
 Jenkins                 Done
@@ -13,8 +13,9 @@ Confluence
 Jira
 ServiceDesk
 newrelic
-SonarQube
+SonarQube               Done
 Selenium
+Nexus                   Done
 
 Nagios
 Splunk
@@ -23,5 +24,3 @@ Prometheus
 ELK Stack
 Saltstack
 Grafana
-
-

@@ -1,0 +1,67 @@
+---
+# sonarqube home: /opt/sonarqube logs: /opt/sonarqube/logs
+- name: Check sonarqube directory is exist or not
+  stat:
+    path: /opt/sonarqube
+  register: sonarqubeDir
+
+- name: Check sonarqube TAR ball exist or not
+  stat:
+    path: /opt/sonarqube.zip
+  register: sonarqubeZip
+
+- name: Get Sonarqube 9.x TAR ball
+  become: true
+  become_method: sudo
+  become_user: vagrant
+  get_url:
+    url: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.1.0.47736.zip
+    dest: /opt/sonarqube.zip
+    validate_certs: false
+    mode: 0644
+  when: not sonarqubeZip.stat.exists
+
+- name: Unpack TAR ball
+  unarchive:
+    dest: /opt
+    src: /opt/sonarqube.zip
+    remote_src: yes
+  when: not sonarqubeDir.stat.exists
+
+- name: Rename sonarqube directory
+  shell:
+    cmd: mv /opt/sonarqube-9.1.0.47736 /opt/sonarqube
+  when: not sonarqubeDir.stat.exists
+
+- name: Copy sonar.properties
+  become: true
+  become_method: sudo
+  template:
+    src: templates/sonar.properties.j2
+    dest: /opt/sonarqube/conf/sonar.properties
+
+- name: Create sonar user
+  become: true
+  become_method: sudo
+  user:
+    name: sonar
+    state: present
+
+- name: Assign sonar user to /opt/sonarqube
+  file:
+    path: /opt/sonarqube
+    owner: sonar
+    group: sonar
+    recurse: yes
+
+- name: Copy sonarqube service script
+  become: true
+  become_method: sudo
+  template:
+    src: templates/sonarqube.service.j2
+    dest: /etc/systemd/system/sonarqube.service
+
+- name: Start sonarqube service
+  service:
+    name: sonarqube
+    state: started

@@ -1,4 +1,4 @@
 ---
-dependencies: 
+dependencies:
   - role: commons
-  - role: docker-debian
+#  - role: docker-debian

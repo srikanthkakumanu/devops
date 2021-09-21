@@ -1,4 +1,4 @@
 ---
-dependencies: 
-  - role: docker-debian
+dependencies:
+#  - role: docker-debian
   - role: openJDK

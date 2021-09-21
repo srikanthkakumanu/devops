@@ -289,8 +289,9 @@ Sandbox or Development environment contains two vagrant boxes:
   - open JDK
   - Git
   - Ansible
-  - jenkins docker image
-  - nexus docker image
+  - jenkins docker image (http://192.168.10.111:8001)
+  - nexus docker image (http://192.168.10.111:8002)
+  - Sonarqube server (http://192.168.10.111:8003) - check sonar.properties
 
 - dev box
   - all common CLI tools
