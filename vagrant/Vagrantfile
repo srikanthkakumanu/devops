@@ -42,7 +42,9 @@ Vagrant.configure("2") do |config|
     config.vm.define "toolbox" do |toolbox|
         Configurator.box(toolbox.vm, "debian/buster64", "toolbox", "192.168.10.111")
         config.vm.provider "virtualbox" do |vb|
-            Configurator.settings(vb, true, 6114, 2)
+            # 6114 assigned for sonarqube or nexus
+            # Configurator.settings(vb, true, 6114, 2)
+            Configurator.settings(vb, true, 3072, 2)
         end
         Configurator.provision(toolbox.vm, true)
     end
