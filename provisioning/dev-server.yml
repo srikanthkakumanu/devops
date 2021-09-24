@@ -7,4 +7,5 @@
   roles:
    - docker-debian
    - openJDK
+   - gradle
 #   - oracleJDK

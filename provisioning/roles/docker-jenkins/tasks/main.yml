@@ -21,7 +21,7 @@
   docker_container:
     name: jenkins-server
     state: started
-    image: jenkins/jenkins:lts
+    image: jenkins/jenkins:latest
     pull: true
     detach: yes
     volumes:
