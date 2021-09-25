@@ -1,0 +1,49 @@
+# Open JDK TARs can be downloaded from the below sites:
+# https://jdk.java.net/16/
+# https://adoptium.net/archive.html
+# https://www.openlogic.com/openjdk-downloads
+- name: Check JDK 11 TAR ball exist or not
+  stat:
+    path: /etc/open-jdk11.tar.gz
+  register: jdktar
+
+- name: Check JDK 11 Directory exist or not
+  stat:
+    path: /usr/lib/java11
+  register: jdkDir
+
+- name: Get Open JDK 11 TAR ball
+  become: yes
+  get_url:
+    url: https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+    dest: /etc/open-jdk11.tar.gz
+    checksum: sha256:99be79935354f5c0df1ad293620ea36d13f48ec3ea870c838f20c504c9668b57
+    validate_certs: false
+    mode: 0644
+  when: not jdktar.stat.exists
+
+- name: Make JAVA 11 Directory
+  file:
+    path: /usr/lib/java11
+    state: directory
+  when: not jdkDir.stat.exists
+
+- name: Unpack TAR ball
+  unarchive:
+    dest: /usr/lib/java11
+    src: /etc/open-jdk11.tar.gz
+    remote_src: yes
+  when: not jdkDir.stat.exists
+
+- name: Update Alternatives for JAVA
+  alternatives:
+    name: java
+    path: /usr/lib/java11/jdk-11.0.2/bin/java
+    link: /usr/bin/java
+    priority: 20000
+
+- name: Set JAVA_HOME Environment variable
+  blockinfile:
+    insertafter: EOF
+    path: /etc/environment
+    block: export JAVA_HOME=/usr/lib/java11/jdk-11.0.2

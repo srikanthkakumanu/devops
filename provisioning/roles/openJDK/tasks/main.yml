@@ -2,48 +2,6 @@
 # https://jdk.java.net/16/
 # https://adoptium.net/archive.html
 # https://www.openlogic.com/openjdk-downloads
-- name: Check JDK TAR ball exist or not
-  stat:
-    path: /etc/openjdk16.tar.gz
-  register: jdktar
-
-- name: Check JDK Directory exist or not
-  stat:
-    path: /usr/lib/java16
-  register: jdkDir
-
-- name: Get Open JDK 16 TAR ball
-  become: yes
-  get_url:
-    url: https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_linux-x64_bin.tar.gz
-    dest: /etc/open-jdk16.tar.gz
-    checksum: sha256:6c714ded7d881ca54970ec949e283f43d673a142fda1de79b646ddd619da9c0c
-    validate_certs: false
-    mode: 0644
-  when: not jdktar.stat.exists
-
-- name: Make JAVA 16 Directory
-  file:
-    path: /usr/lib/java16
-    state: directory
-  when: not jdkDir.stat.exists
-
-- name: Unpack TAR ball
-  unarchive:
-    dest: /usr/lib/java16
-    src: /etc/open-jdk16.tar.gz
-    remote_src: yes
-  when: not jdkDir.stat.exists
-
-- name: Update Alternatives for JAVA
-  alternatives:
-    name: java
-    path: /usr/lib/java16/jdk-16.0.2/bin/java
-    link: /usr/bin/java
-    priority: 20000
-
-- name: Set JAVA_HOME Environment variable
-  blockinfile:
-    insertafter: EOF
-    path: /etc/environment
-    block: export JAVA_HOME=/usr/lib/java16/jdk-16.0.2
+- name: Include JDK YML
+  include: jdk-11.yml
+#include: jdk-16.yml

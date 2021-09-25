@@ -7,7 +7,8 @@
   roles:
   #  - docker-debian
     - openJDK
-    - docker-jenkins
+  #  - docker-jenkins
+    - jenkins
     - gradle
 # Caution: Nexus requires 8GB minimum and Sonarqube requires more memory
   #  - sonarqube

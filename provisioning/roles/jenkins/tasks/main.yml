@@ -1,0 +1,36 @@
+- name: Import Jenkins repository signing key
+  become: true
+  become_method: sudo
+  shell:
+    cmd: wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+
+- name: Create Jenkins file repository configuration
+  become: true
+  become_method: sudo
+  shell:
+    cmd: sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+- name: Update APT packages and Install Jenkins
+  become: true
+  become_method: sudo
+  apt:
+    # update_cache: yes
+    # force_apt_get: yes
+    name: jenkins
+    state: present
+    # upgrade: yes
+    # cache_valid_time: 86400 #One day
+
+- name: Copy Jenkins config file
+  become: true
+  become_method: sudo
+  template:
+    src: templates/jenkins.j2
+    dest: /etc/default/jenkins
+
+- name: Restart Jenkins service
+  become: true
+  become_method: sudo
+  service:
+    name: jenkins
+    state: restarted
