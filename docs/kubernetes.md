@@ -48,6 +48,7 @@ Important to note that: _Please refer to above diagram_.
 - A **pod** runs in a **Node**.
 - A **node** runs in a cluster.
 
+![Kubernetes Cluster Structure](/home/skakumanu/personal/projects/devops/docs/Kubernetes_components.png)
 
 ### 2.1 — K8s Cluster
 
@@ -57,44 +58,41 @@ A K8s cluster consists of a **master node** and set of **worker nodes**.
 
 A **K8s master node a.k.a. Control Plane** consists of **Kube API server, etcd, scheduler, controller manager and cloud controller manager**.
 
-#### **Kube API server** 
+#### 2.2.1 — Kube API server 
 
-- It exposes the K8s API via the implementation _kube-apiserver_. 
+- It exposes the K8s REST API via the implementation _kube-apiserver_. 
 - It is the frontend for K8s master node a.k.a. Control Plane.
 - It can scale horizontally (deploying more instances). We can run several instances of _kube-apiserver_ and balance traffic between those instances.
 
 
-#### **etcd**
+#### 2.2.2 — etcd
 
-It is an open source key-value data store. 
-It is the single source of truth at any given point of time.
-It is built on top of **Raft consensus algorithm/protocol**. 
+- It is an open source key-value data store. 
+- It is the single source of truth at any given point of time.
+- It is built on top of **Raft consensus algorithm/protocol**. 
+- It is used to store K8s config data, state data and metadata.
+- It is fully replicated, reliably consistent, highly available, fast, secure and simple to use.
+- An etcd cluster consists of a leader and couple of follower nodes. A leader election, replication works based on consensus and quorum.
 
 **Raft consensus algorithm** 
-— Raft stands for **Replicated/Reliable And Fault Tolerant**,
+
+Raft stands for **Replicated/Reliable And Fault Tolerant**,
 is an algorithm, protocol and state machine.
 It is a distributed protocol designed to achieve consensus in a 
 replicated state machine. There are many consensus algorithms such as
 Proof Of Work (used by Bitcoin), Proof Of Stake (PoS), Paxos etc.
 
-
-
-- It is used to store K8s config data, state data and metadata.
-- It is fully replicated, reliably consistent, highly available, fast, secure and simple to use. 
-- An etcd cluster consists of a leader and couple of follower nodes. A leader election, replication works based on consensus and quorum.
-
-
-#### **Scheduler**
+#### 2.2.3 — Scheduler
 
 A _kube-scheduler_ that watches for newly created _**pods**_ with no assigned **_node_** and selects a **_node_** for them to run on.
 
 
-#### **Controller Manager**
+#### 2.2.4 — Controller Manager
 
 A _kube-controller-manager_ that manages/runs several controller processes.
 There are many different types of controllers  — Node controller, Job controller, EndpointSlice controller, ServiceAccount controller etc.
 
-#### **Cloud Controller Manager**
+#### 2.2.5 — Cloud Controller Manager
 
 A _cloud-controller-manager_ that embeds cloud-specific control logic. 
 It lets you link your cluster into your cloud provider's API.
@@ -118,19 +116,21 @@ a **pod** runs in a **Node**,
 a **node** runs in a cluster, 
 and all applications are to be containerized.
 
-#### **Kubelet**
+#### 2.3.1 — Kubelet
 
 It is an agent that runs on every node in a cluster. 
 It makes sure that
 containers in a _pod_ are running and healthy.
 
-#### **Kube-Proxy**
+#### 2.3.2 — Kube-Proxy
 
 - Kube-Proxy runs on every node in a cluster. 
 - maintains network rules on nodes.
 - It allows network communication to a Pod from inside/outside a network.
 
-#### **Container Runtime**
+#### 2.3.3 — Container Runtime
+
+Every node consists of a Container Runtime where Pods are present. 
 
 There are two important standards around containers — 
 
@@ -148,6 +148,92 @@ There are Container runtimes such as
 - **_Dockershim_** — was a component of Kubernetes that added the required CRI abstraction in front of Docker Engine to make Kubernetes recognize Docker Engine as CRI compatible. _It has been deprecated_.
 - **_containerd_** — is from Docker, it uses _runC_ under the hood for container execution.
 - _**cri-o**_ — is from RedHat, IBM etc. It is a CRI implementation that enables using any OCI compatible runtimes.
+
+## 3 — Running Kubernetes Locally
+
+There are several ways to run Kubernetes on developer/local machine.
+
+- **microk8s** — 
+  - MicroK8s is a fully compliant Kubernetes distribution with a smaller CPU and memory footprint. 
+  - It supports multiple worker nodes.
+- **Docker desktop** — 
+  - Limited to 1 node.
+- **minikube** — 
+  - Minikube is a tool that enables us to run a local, **single-node Kubernetes cluster** on our machine. 
+  - It supports multiple worker nodes. 
+  - It can also run on Docker Desktop (not mandatory), Hyper-V, Virtual Box, VMWare etc.
+- **Kind** — 
+  - Kind stands for **Kubernetes In Docker**.
+  - Only requires Docker installed and no need of another VM installation.
+  - **Installs the nodes as containers**.
+  - It can emulate multiple control planes and multiple worker nodes. 
+
+### 3.1 — kubectl CLI
+
+- kubectl is Kubernetes CLI. 
+- It communicates with _**kube-apiserver**_ (Kubernetes API server).
+- Connection/configuration stored locally at `${HOME}/.kube/config`.
+
+
+To verify the Kubernetes Installation: `kubectl cluster-info`
+
+## 4 — K8s Context
+
+- A context is a group of access parameters to a K8s cluster.
+- Contains a K8s cluster name, a user, and a namespace.
+- The current context is the cluster that is currently the default for kubectl.
+- All kubectl commands run against that cluster.
+
+
+Get the current context — `kubectl config current-context`
+List all context — `kubectl config get-contexts`
+Set the current context — `kubectl config use-context [contextName]`
+Delete a context from the config file (`${HOME}/.kube/config`) — `kubectl config delete-context [contextName]`
+
+## 5 — Declarative Vs. Imperative
+
+### Imperative way 
+
+Imperative way advocates the usage of _kubectl_.
+
+Examples:-
+```commandline
+kubectl run mynginx --image=nginx --port=80
+kubectl create deploy mynginx --image=nginx --port=80 --replicas=3
+kubectl delete deploy mynginx
+kubectl create service nodeport myservice --targetPort=8080
+kubectl delete pod nginx
+```
+
+Creates the deployment — `kubectl create deployment mynginx --image=nginx`
+List the deployments — `kubectl get deploy`
+Cleanup — `kubectl delete deployment mynginx`
+
+### Declarative Way 
+
+Declarative way advocates the usage of YAML.
+
+Example:-
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+```
+
+
+Create an object using YAML — `kubectl create -f [YAML file]`
+Creates the deployment — `kubectl create -f deployment.xml`
+To Apply the existing file — `kubectl apply -f https://k8s.io/examples/controllers/nginx-deployment.yaml`
+Creating new YAML manifests using kubectl — 
+`kubectl create deploy mynginx --image=nginx --port=80 --replicas=3 --dry-run=client -o yaml`
 
 
 </div>
