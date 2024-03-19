@@ -236,4 +236,17 @@ Creating new YAML manifests using kubectl —
 `kubectl create deploy mynginx --image=nginx --port=80 --replicas=3 --dry-run=client -o yaml`
 
 
+
+## — CLI - Commands Cheatsheet
+
+Version: `kubectl version`
+
+Help: `kubectl --help`
+
+List of Nodes: `kubectl get nodes`
+
+List of Nodes with detailed info: `kubectl get -o wide nodes`
+
+
+
 </div>
