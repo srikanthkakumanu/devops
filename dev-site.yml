@@ -1,3 +1,3 @@
 ---
-- import_playbook: provisioning/tools-server.yml
-#- import_playbook: provisioning/dev-server.yml
+- import_playbook: provisioning/ansible-vagrant/tools-server.yml
+#- import_playbook: provisioning/ansible-vagrant/dev-server.yml

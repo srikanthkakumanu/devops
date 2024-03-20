@@ -174,9 +174,6 @@ There are several ways to run Kubernetes on developer/local machine.
 - It communicates with _**kube-apiserver**_ (Kubernetes API server).
 - Connection/configuration stored locally at `${HOME}/.kube/config`.
 
-
-To verify the Kubernetes Installation: `kubectl cluster-info`
-
 ## 4 — K8s Context
 
 - A context is a group of access parameters to a K8s cluster.
@@ -184,19 +181,12 @@ To verify the Kubernetes Installation: `kubectl cluster-info`
 - The current context is the cluster that is currently the default for kubectl.
 - All kubectl commands run against that cluster.
 
-
-Get the current context — `kubectl config current-context`
-List all context — `kubectl config get-contexts`
-Set the current context — `kubectl config use-context [contextName]`
-Delete a context from the config file (`${HOME}/.kube/config`) — `kubectl config delete-context [contextName]`
-
 ## 5 — Declarative Vs. Imperative
 
-### Imperative way 
+Imperative approach advocates the usage of _kubectl_, 
+and Declarative approach advocates the usage of YAML.
 
-Imperative way advocates the usage of _kubectl_.
-
-Examples:-
+CLI Examples:-
 ```commandline
 kubectl run mynginx --image=nginx --port=80
 kubectl create deploy mynginx --image=nginx --port=80 --replicas=3
@@ -205,15 +195,7 @@ kubectl create service nodeport myservice --targetPort=8080
 kubectl delete pod nginx
 ```
 
-Creates the deployment — `kubectl create deployment mynginx --image=nginx`
-List the deployments — `kubectl get deploy`
-Cleanup — `kubectl delete deployment mynginx`
-
-### Declarative Way 
-
-Declarative way advocates the usage of YAML.
-
-Example:-
+YAML Example:-
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -228,13 +210,28 @@ spec:
       image: nginx
 ```
 
+### 5.1 — YAML - Declarative Approach
 
-Create an object using YAML — `kubectl create -f [YAML file]`
-Creates the deployment — `kubectl create -f deployment.xml`
-To Apply the existing file — `kubectl apply -f https://k8s.io/examples/controllers/nginx-deployment.yaml`
-Creating new YAML manifests using kubectl — 
-`kubectl create deploy mynginx --image=nginx --port=80 --replicas=3 --dry-run=client -o yaml`
+Each K8s YAML file must contain the following **mandatory** fields:
 
+```yaml
+apiVersion:
+kind:
+metadata:
+
+
+spec:
+
+```
+
+**Kind Types and Versions**
+
+| Kind       | Version |
+|------------|---------|
+| Pod        | v1      |
+| Service    | v1      |
+| ReplicaSet | apps/v1 |
+| Deployment | apps/v1 |
 
 
 ## — CLI - Commands Cheatsheet
@@ -243,10 +240,103 @@ Version: `kubectl version`
 
 Help: `kubectl --help`
 
+To verify the Kubernetes Installation: `kubectl cluster-info`
+
+
+### Contexts
+
+Get the current context — `kubectl config current-context`
+
+List all context — `kubectl config get-contexts`
+
+Set the current context — `kubectl config use-context [contextName]`
+
+Delete a context from the config file (`${HOME}/.kube/config`) — `kubectl config delete-context [contextName]`
+
+### Nodes
+
 List of Nodes: `kubectl get nodes`
 
 List of Nodes with detailed info: `kubectl get -o wide nodes`
 
+Create a Pod by pulling a container image from container registry: `kubectl run webserver --image=nginx`
+
+### Create a YAML manifest
+
+Creating new YAML manifests using kubectl:
+
+`kubectl create deploy mynginx --image=nginx --port=80 --replicas=3 --dry-run=client -o yaml`
+
+### Resource
+
+To create any resource/object from YAML:
+
+A resource can be a Pod/Deployment/Service/Replicaset/StatefulSet etc.
+
+`kubectl create -f [YAML file]`
+
+
+### Pods
+
+List of Pods: `kubectl get pods`
+
+Detailed info about a Pod: `kubectl describe pod webserver`
+
+Create Pods: 
+`kubectl run webserver --image=nginx --port=80` or, `kubectl run mariadb-test-pod --image=mariadb --env="MARIADB_ROOT_PASSWORD=secret"`
+
+Create Pods using YAML (Can use either of the commands):
+`kubectl apply -f pod.yaml` or, `kubectl create -f pod.yaml`
+
+Delete Pods: `kubectl delete pod webserver`
+
+To Debug or get more information about Pod:
+
+`kubectl describe pod mariadb-test-pod`
+
+To get Logs from a running Pod:
+
+`kubectl logs mariadb-test-pod`
+
+To attach a shell to a running Pod:
+
+`kubectl exec -it mariadb-deployment-simple-5796f7df7d-lp9wj -- mariadb -uroot -ppassword -e "select current_user()"`
+
+
+### Deployments
+
+Create a Deployment:
+
+`kubectl create deployment mynginx --image=nginx`
+
+`kubectl create deploy webserver --image=nginx --port=80 --replicas=3`
+
+`kubectl apply -f deployment.yaml`
+
+`kubectl create -f deployment.yaml`
+
+Example: To Apply the existing file — `kubectl apply -f https://k8s.io/examples/controllers/nginx-deployment.yaml`
+
+List the Deployments: 
+
+`kubectl get deploy`
+
+`kubectl get deployment`
+
+`kubectl get deployments`
+
+Delete Deployments: (mynginx - can also be the _name_ property value (In metadata) from deployment YAML) 
+
+`kubectl delete deploy mynginx`
+
+`kubectl delete deployment mynginx`
+
+
+### Services
+
+`kubectl create service nodeport myservice --targetPort=8080`
+
+`kubectl delete pod nginx`
 
 
 </div>

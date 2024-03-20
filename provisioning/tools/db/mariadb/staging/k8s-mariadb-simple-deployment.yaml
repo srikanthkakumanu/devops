@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment # what to create?
+metadata:
+  name: mariadb-deployment-simple
+spec: # specification for deployment resource
+  replicas: 1 # how many replicas of pods we want to create
+  selector:
+    matchLabels:
+      app: mariadb
+  template: # blueprint for pods
+    metadata:
+      labels:
+        app: mariadb # service will look for this label
+    spec: # specification for pods
+      containers: # we can have one or more containers
+        - name: mariadb
+          image: mariadb
+          ports:
+            - containerPort: 3306
+          env:
+            #- name: MARIADB_RANDOM_ROOT_PASSWORD
+            - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+              value: "0" # if it is 1 and root_password is set, root_password takes precedence
+            - name: MARIADB_ROOT_PASSWORD
+              value: password

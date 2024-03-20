@@ -1,4 +1,4 @@
 .idea
 .vscode
-vagrant/.vagrant
+provisioning/ansible-vagrant/vagrant/.vagrant
 todo.txt
