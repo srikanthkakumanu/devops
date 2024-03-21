@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webserver # Pod gets created with this name
+  labels: # key and value pair dictionary
+    app: nginx-webserver
+    tier: frontend
+spec: # is a dictionary
+  containers: # a list of objects
+    # A Pod can run multiple containers like below but it is not a best practice.
+    # container - a list and below each list is again a dictionary.
+    - name: webserver # name of the container within a pod.
+      image: nginx # pulls from docker registry, please mention full path if other registry is used.
+      #- name: busybox
+      #  image: busybox
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 8080
+      livenessProbe:
+        httpGet:
+          path: /index.html
+          port: 8080
+        initialDelaySeconds: 15
+        periodSeconds: 10

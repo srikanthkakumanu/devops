@@ -234,6 +234,32 @@ spec:
 | Deployment | apps/v1 |
 
 
+## 6 — Pod
+
+Typically, an application instance running as a container.
+Containers are encapsulated into an object known as **Pods**.
+**A Pod is an instance of an application**. 
+A Pod is the smallest object that we can create in K8s.
+A Pod has 1:1 relationship with a container. 
+However, it is not a limitation but is a best practice. 
+Thus, to create more application instances (aka containers), 
+we create more Pods.
+
+We can still run additional containers within a Pod along with the application container, 
+these additional containers are considered as 
+**helper or sidecar container** to perform auxiliary tasks.
+
+K8s pods are designed to be ephemeral and stateless, 
+managed by higher-level controllers like 
+Deployments, StatefulSets, or DaemonSets2.
+
+K8s doesn't support stop/pause of current state of pod and 
+resume when needed. Thus, graceful/forceful deletion of a Pod 
+is the solution.
+
+
+
+
 ## — CLI - Commands Cheatsheet
 
 Version: `kubectl version`
@@ -278,9 +304,23 @@ A resource can be a Pod/Deployment/Service/Replicaset/StatefulSet etc.
 
 ### Pods
 
-List of Pods: `kubectl get pods`
+List of Pods: 
 
-Detailed info about a Pod: `kubectl describe pod webserver`
+`kubectl get pods`
+
+`kubectl get po`
+
+`kubectl get po,svc` - pods and services
+
+`kubectl get po -o wide`
+
+`kubectl get po -o json`
+
+Detailed info about a Pod: 
+
+`kubectl describe pod webserver`
+
+`kubectl describe po webserver`
 
 Create Pods: 
 `kubectl run webserver --image=nginx --port=80` or, `kubectl run mariadb-test-pod --image=mariadb --env="MARIADB_ROOT_PASSWORD=secret"`
@@ -288,11 +328,21 @@ Create Pods:
 Create Pods using YAML (Can use either of the commands):
 `kubectl apply -f pod.yaml` or, `kubectl create -f pod.yaml`
 
-Delete Pods: `kubectl delete pod webserver`
+Delete Pods: 
+
+`kubectl delete pod webserver`
+
+`kubectl delete po webserver`
+
+`kubectl delete pod webserver --force`
+
+`kubectl scale deployment my-deployment -replicas=0`
 
 To Debug or get more information about Pod:
 
 `kubectl describe pod mariadb-test-pod`
+
+`kubectl describe po webserver`
 
 To get Logs from a running Pod:
 
@@ -300,7 +350,13 @@ To get Logs from a running Pod:
 
 To attach a shell to a running Pod:
 
+`kubectl exec -it webserver -- /bin/bash`
+
 `kubectl exec -it mariadb-deployment-simple-5796f7df7d-lp9wj -- mariadb -uroot -ppassword -e "select current_user()"`
+
+To connect to specific container:
+
+`kubectl exec -it webserver -c busybox -- /bin/bash`
 
 
 ### Deployments
@@ -331,12 +387,29 @@ Delete Deployments: (mynginx - can also be the _name_ property value (In metadat
 
 `kubectl delete deployment mynginx`
 
+`kubectl scale deployment my-deployment -replicas=0`
+
 
 ### Services
 
 `kubectl create service nodeport myservice --targetPort=8080`
 
 `kubectl delete pod nginx`
+
+Create a service to expose a Pod:
+
+`kubectl expose pod webserver --type=NodePort --port=80 --name=nginx-service`
+
+Verify if the service is created:
+
+`kubectl get svc`
+
+`kubectl get svc -o wide`
+
+`kubectl get po,svc`
+
+Access the exposed NGINX homepage via browser by given port number.
+
 
 
 </div>
