@@ -7,7 +7,7 @@ metadata:
     tier: frontend
 spec: # is a dictionary
   containers: # a list of objects
-    # A Pod can run multiple containers like below but it is not a best practice.
+    # A Pod can run multiple containers like below, but it is not a best practice.
     # container - a list and below each list is again a dictionary.
     - name: webserver # name of the container within a pod.
       image: nginx # pulls from docker registry, please mention full path if other registry is used.

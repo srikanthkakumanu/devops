@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    app: api
+    type: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+      type: api
+  template:
+    metadata: # Pod definition below.
+      name: api-pod
+      labels:
+        app: api
+        type: api
+    spec:
+      containers:
+        - name: api-pod
+          image: srik1980/api:latest
+          #          resources:
+          #            limits:
+          #              memory: "128Mi"
+          #              cpu: "500m"
+          ports:
+            - containerPort: 9000
+          # livenessProbe:
+          #   httpGet:
+          #     path: /api/greetings
+          #     port: 9000
+          #   initialDelaySeconds: 15
+          #   periodSeconds: 10
+          # command:
+          #   - sh
+          #   - "-c"
+          #   - echo Hello API! && sleep 3600

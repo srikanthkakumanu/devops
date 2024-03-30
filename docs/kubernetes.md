@@ -257,6 +257,35 @@ K8s doesn't support stop/pause of current state of pod and
 resume when needed. Thus, graceful/forceful deletion of a Pod 
 is the solution.
 
+## 7 — Replica Sets
+
+A ReplicaSet's purpose is to maintain a stable set of replica Pods running at any given time. As such, it is often used to guarantee the availability of a specified number of identical Pods.
+
+Replicaset's ensures the availability of pods.
+They monitor the pods and filter them with the help of `labels` (defined under `metadata` section). 
+
+## 7 — Deployments
+
+A Deployment provides declarative updates for Pods and Replicasets. 
+We can define Deployments to create new Replicasets or to remove
+existing Deployments and adopt all their resources with 
+new Deployments.
+
+## 8 — Services
+
+A service is a method for exposing a network application that is running
+as one or more Pods in a cluster. 
+
+A service enables the communication between applications 
+in a K8s cluster and also can expose outside the cluster 
+to help the apps that are outside the cluster.
+It provides an endpoint for other services to connect.
+
+We have three types of services:
+
+1. ClusterIP service — It does not expose externally but helps different services to communicate each other. 
+2. NodePort service — It exposes a port outside the cluster for external apps.
+3. Load Balancer service — Provisions a load balancer for a service for external apps to connect and distribute the load among multiple nodes.
 
 
 
@@ -267,6 +296,8 @@ Version: `kubectl version`
 Help: `kubectl --help`
 
 To verify the Kubernetes Installation: `kubectl cluster-info`
+
+To all the information in K8s cluster: `kubectl get all`
 
 
 ### Contexts
@@ -358,6 +389,34 @@ To connect to specific container:
 
 `kubectl exec -it webserver -c busybox -- /bin/bash`
 
+### Replicaset
+
+To List Replicasets:
+
+`kubectl get replicaset`
+
+`kubectl get rs`
+
+`kubectl get replicaset -o wide`
+
+`kubectl get po,replicaset,deploy,svc -o wide`
+
+Create Replicaset via YAML:
+
+`kubectl apply -f api-replicaset.yaml`
+
+`kubectl create -f api-replicaset.yaml`
+
+Scale the Replicaset:
+
+Via YAML: `kubectl replace -f api-replicaset.yaml` (Recommended)
+
+Via CLI: `kubectl scale --replicas=6 -f api-replicaset.yaml`
+
+Delete the Replicaset:
+
+`kubectl delete replicaset myapp-replicaset`
+
 
 ### Deployments
 
@@ -367,11 +426,26 @@ Create a Deployment:
 
 `kubectl create deploy webserver --image=nginx --port=80 --replicas=3`
 
+`kubectl create deployment httpd-frontend --image=httpd:2.4-alpine --replicas=3`
+
 `kubectl apply -f deployment.yaml`
 
 `kubectl create -f deployment.yaml`
 
 Example: To Apply the existing file — `kubectl apply -f https://k8s.io/examples/controllers/nginx-deployment.yaml`
+
+Update an existing Deployment:
+
+Once a Deployment is created,
+
+`kubectl apply -f api-deployment.yaml`
+
+Or, we can directly refer to container name and update new image version.
+
+`kubectl set image deployment/api-deployment.yml [container-name]=srik1980/api:v1`
+
+Ex:- `kubectl set image deployment/api-deployment.yml nginx-container=nginx:1.9.1`
+
 
 List the Deployments: 
 

@@ -34,6 +34,7 @@ Docker desktop is a GUI tool that comes with the following.
 - `docker kill [containerName]` — Kills the container but this command is rarely used.
 - `docker rm [containerName]` — Removes the container.
 - `docker image inspect [imageName]` — Gets image information, useful for debugging purpose.
+- `docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id` — To know the IP address of a running container.
 
 ### 2.2 — **Limits**
 
@@ -261,3 +262,4 @@ services:
 - `docker pull dbapp/firstImage:latest` — Pull the image.
 
 </div>
+
