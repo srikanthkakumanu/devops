@@ -261,5 +261,12 @@ services:
 - `docker push dbapp/firstImage:latest` — Push the image
 - `docker pull dbapp/firstImage:latest` — Pull the image.
 
+## 5 **Docker Networking**
+
+There are various types of Docker Networking that we can use via command line or via Docker compose.
+
+Examples are: *Bridge, Host, IPvlan, Macvlan, Overlay*.
+
+For more details, watch this YouTube video: [https://www.youtube.com/watch?v=fBRgw5dyBd4](https://www.youtube.com/watch?v=fBRgw5dyBd4)
 </div>
 
