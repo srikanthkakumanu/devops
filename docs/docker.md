@@ -83,7 +83,7 @@ We can enable file system persistence by using docker volumes.
   - `docker stop webserver` — Stops the running container.
   - `docker rm webserver` — Removes the container.
   - `docker volume rm myvolume` — Removes the volume.
-- `docker rm myvolume` — Removes the volume.
+  - `docker rm myvolume` — Removes the volume.
 
 ## 3 — **Docker Compose**
 
@@ -94,6 +94,8 @@ We can enable file system persistence by using docker volumes.
 - `docker compose ps` — List what's running
 - `docker compose rm` — Remove from memory
 - `docker compose down` — Stop and remove
+- `docker compose down --volumes` — To remove all containers, networks, and volumes for a clean slate.
+
 - `docker compose logs` — Get the logs
 - `docker compose logs -f [serviceName]` — Look at the container logs of a particular service.
   - Ex:- `docker compose logs -f web-fe`
