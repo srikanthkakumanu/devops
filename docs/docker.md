@@ -94,10 +94,10 @@ We can enable file system persistence by using docker volumes.
 - `docker compose ps` — List what's running
 - `docker compose rm` — Remove from memory
 - `docker compose down` — Stop and remove
-- `docker compose down --volumes` — To remove all containers, networks, and volumes for a clean slate.
+- `docker compose down --volumes` or `docker compose down -v` — To remove all containers, networks, and volumes for a clean slate.
 
 - `docker compose logs` — Get the logs
-- `docker compose logs -f [serviceName]` — Look at the container logs of a particular service.
+- `docker compose logs -f [serviceName]` — Look at the  container logs of a particular service.
   - Ex:- `docker compose logs -f web-fe`
 - `docker compose exec [container] bash` — Run a command in a container
 
