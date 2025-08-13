@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: practice  # Replace with your desired database name
+      POSTGRES_USER: srikanth    # Replace with your desired username
+      POSTGRES_PASSWORD: srikanth # Replace with your desired password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - postgres_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: srikanthkakumanu@yahoo.com # Replace with your desired email
+      PGADMIN_DEFAULT_PASSWORD: password # Replace with your desired password
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    networks:
+      - postgres_network
+
+volumes:
+  pgdata:
+
+networks:
+  postgres_network:
+    driver: bridge
+    name: postgres_network
+    attachable: true
