@@ -25,6 +25,24 @@ The Clinica microservice is a secure Spring Boot application for managing clinic
 
 ## Sidecar Health Check Pattern
 
+### Understanding Kubernetes Pods and Multi-Container Patterns
+
+In Kubernetes, a **Pod** is the smallest deployable unit that can contain one or more containers. While single-container pods are common, multi-container pods offer several advantages:
+
+- **Shared Resources**: Containers in the same pod share network namespace, IPC, and can mount the same volumes
+- **Co-located Processes**: Related processes can run together for better performance and resource utilization
+- **Service Dependencies**: Helper containers can provide services to the main application
+
+**Sidecar Pattern**: A sidecar container extends the main application's functionality without modifying the application itself. Common use cases include:
+
+- **Health Monitoring** (our implementation)
+- **Logging and Metrics Collection**
+- **Configuration Management**
+- **Security Proxies**
+- **Data Synchronization**
+
+### Clinica Sidecar Implementation
+
 The Clinica microservice implements a sidecar health check pattern using a dedicated container that performs comprehensive health monitoring alongside the main application.
 
 ### How It Works
@@ -45,6 +63,24 @@ The Clinica microservice implements a sidecar health check pattern using a dedic
 - **Extensible**: Easy to add custom health checks (database, external services, etc.)
 - **Logging**: Detailed health check logs for troubleshooting
 - **Zero-Trust**: Separate container ensures unbiased health assessment
+
+### When to Use Multi-Container Pods
+
+**Use multi-container pods when:**
+
+- Containers need to share resources (network, volumes, IPC)
+- Containers have tight coupling and should be deployed together
+- You need helper processes that enhance main application functionality
+- Containers need to communicate via localhost efficiently
+
+**Common sidecar use cases:**
+
+- **Health checks and monitoring** (our implementation)
+- **Logging and metrics collection**
+- **Configuration hot-reloading**
+- **Security proxies and authentication**
+- **Data synchronization and backup**
+- **Network proxies and service meshes**
 
 ## Prerequisites
 
@@ -79,7 +115,7 @@ cd /Users/skakumanu/practice/devops/k8s/apps/clinica
 # Apply ConfigMap
 kubectl apply -f configmap.yaml
 
-# Apply Deployment
+# Apply Deployment (contains multi-container pod with main app + sidecar)
 kubectl apply -f deployment.yaml
 
 # Apply Service

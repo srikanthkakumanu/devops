@@ -42,6 +42,14 @@ The Clinica microservice is a Spring Boot-based REST API that provides clinic ma
 - Independent health assessment for enhanced reliability
 - Comprehensive logging and status reporting
 
+**Kubernetes Multi-Container Pod:**
+This deployment demonstrates the **sidecar pattern** where multiple containers run in the same Kubernetes pod. The main Clinica application container and the health check sidecar container share:
+
+- Network namespace (localhost communication)
+- Volumes (shared health status)
+- Lifecycle (created/destroyed together)
+- Resource limits and scheduling
+
 ### API Endpoints
 
 #### Core Resources
