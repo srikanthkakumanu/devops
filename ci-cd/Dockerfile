@@ -14,8 +14,8 @@ FROM eclipse-temurin:21-jre-jammy
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-        curl \
-        dumb-init && \
+    curl \
+    dumb-init && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
@@ -40,8 +40,8 @@ EXPOSE 9091
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["java", \
-     "-XX:+UseContainerSupport", \
-     "-XX:MaxRAMPercentage=75.0", \
-     "-Djava.security.egd=file:/dev/./urandom", \
-     "-jar", \
-     "app.jar"]
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-Djava.security.egd=file:/dev/./urandom", \
+    "-jar", \
+    "app.jar"]

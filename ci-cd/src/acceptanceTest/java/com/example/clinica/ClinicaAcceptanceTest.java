@@ -18,43 +18,43 @@ public class ClinicaAcceptanceTest {
     @Test
     public void testGetAllClinics() {
         given()
-            .auth().basic("admin", "admin")
-        .when()
-            .get("/clinics")
-        .then()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("_embedded.clinics", hasSize(greaterThanOrEqualTo(0)));
+                .auth().basic("admin", "admin")
+                .when()
+                .get("/clinics")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("_embedded.clinics", hasSize(greaterThanOrEqualTo(0)));
     }
 
     @Test
     public void testCreateClinic() {
         String clinicJson = """
-            {
-                "name": "Test Clinic",
-                "address": "123 Test St",
-                "phone": "555-0123"
-            }
-            """;
+                {
+                    "name": "Test Clinic",
+                    "address": "123 Test St",
+                    "phone": "555-0123"
+                }
+                """;
 
         given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body(clinicJson)
-        .when()
-            .post("/clinics")
-        .then()
-            .statusCode(201)
-            .body("name", equalTo("Test Clinic"));
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(clinicJson)
+                .when()
+                .post("/clinics")
+                .then()
+                .statusCode(201)
+                .body("name", equalTo("Test Clinic"));
     }
 
     @Test
     public void testHealthCheck() {
         given()
-        .when()
-            .get("/actuator/health")
-        .then()
-            .statusCode(200)
-            .body("status", equalTo("UP"));
+                .when()
+                .get("/actuator/health")
+                .then()
+                .statusCode(200)
+                .body("status", equalTo("UP"));
     }
 }

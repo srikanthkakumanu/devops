@@ -7,7 +7,7 @@ This directory contains a comprehensive CI/CD pipeline for the Clinica microserv
 ```mermaid
 graph TD
     A[Code Push/PR] --> B[CI Pipeline Trigger]
-    
+
     subgraph CI_Pipeline [CI Pipeline]
         B --> C[Checkout Code]
         C --> D[Setup JDK 21]
@@ -16,37 +16,37 @@ graph TD
         F --> G[Unit Tests]
         G --> H[JaCoCo Coverage]
         H --> I[Codecov Upload]
-        
+
         I --> J[Integration Tests]
         J --> K[Acceptance Tests]
-        
+
         K --> L[SonarQube Analysis]
         L --> M[Quality Gate Check]
-        
+
         M --> N[Trivy Security Scan]
         N --> O[Dependency Check]
         O --> P[License Check]
-        
+
         P --> Q[Build Docker Image]
         Q --> R[Test Docker Container]
         R --> S[Upload Artifacts]
-        
+
         S --> T[CI Success]
     end
-    
+
     subgraph CD_Pipeline [CD Pipeline]
         T --> U[CD Pipeline Trigger]
-        
+
         U --> V[Build & Push Docker Image]
         V --> W[Deploy to Staging]
         W --> X[Smoke Tests]
         X --> Y[Performance Tests]
-        
+
         Y --> Z[Deploy to Production]
         Z --> AA[Production Smoke Tests]
         AA --> BB[Notifications]
     end
-    
+
     %% Styling
     classDef trigger fill:#e1f5fe
     classDef build fill:#f3e5f5
@@ -55,7 +55,7 @@ graph TD
     classDef security fill:#ffebee
     classDef deploy fill:#f3e5f5
     classDef success fill:#e8f5e8
-    
+
     class A,B,U trigger
     class C,D,E,F,V,W,Z build
     class G,H,I,J,K,X,Y,AA test
@@ -185,6 +185,7 @@ CODECOV_TOKEN
 ### Infrastructure Setup
 
 1. **AWS EKS Clusters**
+
    ```bash
    cd terraform
    terraform init
@@ -223,26 +224,31 @@ ci-cd/
 ## Testing Strategy
 
 ### Unit Tests
+
 - Framework: JUnit 5
 - Coverage: JaCoCo
 - Location: `src/test/java/`
 
 ### Integration Tests
+
 - Test database interactions
 - Location: `src/integrationTest/java/`
 - Uses PostgreSQL in CI
 
 ### Acceptance Tests
+
 - API contract testing with RestAssured
 - Location: `src/acceptanceTest/java/`
 - Tests full application stack
 
 ### Load Tests
+
 - Tool: Apache JMeter
 - Configuration: `load-tests/clinica-load-test.jmx`
 - Simulates 50 concurrent users
 
 ### Performance Tests
+
 - Tool: Apache JMeter
 - Configuration: `performance-tests/clinica-performance-test.jmx`
 - Tests response times under load
@@ -250,12 +256,14 @@ ci-cd/
 ## Deployment Environments
 
 ### Staging
+
 - Cluster: `clinica-staging-cluster`
 - Namespace: `default`
 - Replicas: 2
 - Resources: 512Mi RAM, 0.25 CPU
 
 ### Production
+
 - Cluster: `clinica-prod-cluster`
 - Namespace: `default`
 - Replicas: 3
@@ -281,17 +289,20 @@ ci-cd/
 ### Running Locally
 
 1. **Build and Test**
+
    ```bash
    ./gradlew build
    ./gradlew test
    ```
 
 2. **Run Acceptance Tests**
+
    ```bash
    ./gradlew acceptanceTest
    ```
 
 3. **Load Testing**
+
    ```bash
    jmeter -n -t load-tests/clinica-load-test.jmx
    ```
@@ -304,11 +315,13 @@ ci-cd/
 ### Manual Deployment
 
 1. **Build Docker Image**
+
    ```bash
    docker build -t clinica:latest .
    ```
 
 2. **Push to DockerHub**
+
    ```bash
    docker tag clinica:latest srikanthkakumanu/clinica:latest
    docker push srikanthkakumanu/clinica:latest
