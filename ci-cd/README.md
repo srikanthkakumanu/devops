@@ -80,6 +80,10 @@ graph TD
    - Staging deployment with smoke and performance tests
    - Production deployment with final validation
 
+## Interactive Animation
+
+For an animated visualization of the pipeline flow, open the [pipeline-animation.html](pipeline-animation.html) file in your web browser. The interactive animation highlights each step sequentially, providing a dynamic view of the CI/CD process.
+
 ## Overview
 
 The pipeline includes the following stages and tools:
