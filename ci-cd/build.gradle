@@ -1,0 +1,181 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
+    id 'org.sonarqube' version '4.4.1.3373'
+    id 'com.github.spotbugs' version '6.0.0'
+    id 'com.palantir.docker' version '0.36.0'
+    id 'com.palantir.docker-run' version '0.36.0'
+}
+
+group = 'com.clinica'
+version = '1.0-SNAPSHOT'
+sourceCompatibility = '21'
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    acceptanceTestImplementation.extendsFrom testImplementation
+    acceptanceTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integrationTest/java')
+        }
+        resources.srcDir file('src/integrationTest/resources')
+    }
+    acceptanceTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/acceptanceTest/java')
+        }
+        resources.srcDir file('src/acceptanceTest/resources')
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+
+    // Database
+    runtimeOnly 'com.h2database:h2'
+    testRuntimeOnly 'org.postgresql:postgresql'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+
+    // Integration Testing
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    integrationTestImplementation 'org.springframework.security:spring-security-test'
+    integrationTestImplementation 'org.testcontainers:junit-jupiter'
+    integrationTestImplementation 'org.testcontainers:postgresql'
+
+    // Acceptance Testing
+    acceptanceTestImplementation 'io.rest-assured:rest-assured:5.4.0'
+    acceptanceTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    acceptanceTestImplementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Performance Testing
+    implementation 'io.gatling.highcharts:gatling-charts-highcharts:3.10.5'
+
+    // Code Quality
+    implementation 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+tasks.named('integrationTest') {
+    useJUnitPlatform()
+    shouldRunAfter test
+}
+
+tasks.named('acceptanceTest') {
+    useJUnitPlatform()
+    shouldRunAfter integrationTest
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.8
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "clinica-microservice"
+        property "sonar.projectName", "Clinica Microservice"
+        property "sonar.projectVersion", "1.0"
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java,src/integrationTest/java,src/acceptanceTest/java"
+        property "sonar.java.binaries", "build/classes/java/main"
+        property "sonar.java.test.binaries", "build/classes/java/test,build/classes/java/integrationTest,build/classes/java/acceptanceTest"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.exclusions", "**/generated/**"
+    }
+}
+
+docker {
+    name "clinica:${project.version}"
+    files tasks.bootJar.outputs.files
+    buildArgs(['JAR_FILE': tasks.bootJar.outputs.files.singleFile.name])
+}
+
+task integrationTest(type: Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+    shouldRunAfter test
+}
+
+task acceptanceTest(type: Test) {
+    description = 'Runs acceptance tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.acceptanceTest.output.classesDirs
+    classpath = sourceSets.acceptanceTest.runtimeClasspath
+    useJUnitPlatform()
+    shouldRunAfter integrationTest
+}
+
+task performanceTest(type: JavaExec) {
+    description = 'Runs performance tests using Gatling.'
+    group = 'verification'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'io.gatling.app.Gatling'
+    args = ['-s', 'com.clinica.performance.ClinicaSimulation']
+    shouldRunAfter acceptanceTest
+}
+
+task loadTest(type: JavaExec) {
+    description = 'Runs load tests using Gatling.'
+    group = 'verification'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'io.gatling.app.Gatling'
+    args = ['-s', 'com.clinica.load.ClinicaLoadSimulation']
+    shouldRunAfter performanceTest
+}

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clinica-production
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: clinica
+      environment: production
+  template:
+    metadata:
+      labels:
+        app: clinica
+        environment: production
+    spec:
+      containers:
+      - name: clinica
+        image: docker.io/srikanthkakumanu/clinica:{{IMAGE_TAG}}
+        ports:
+        - containerPort: 9091
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "production"
+        - name: DOCTOR_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: clinica-config-prod
+              key: doctor.service.url
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 9091
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 9091
+          initialDelaySeconds: 30
+          periodSeconds: 10

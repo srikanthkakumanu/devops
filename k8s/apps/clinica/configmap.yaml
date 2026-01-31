@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clinica-config
+  namespace: default
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  DOCTOR_SERVICE_URL: "http://doctor-service:9092"  # Assuming doctor service is deployed separately
+  DOCTOR_SERVICE_USERNAME: "admin"
+  DOCTOR_SERVICE_PASSWORD: "password"
+  JAVA_OPTS: "-Xmx512m -Xms256m"

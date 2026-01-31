@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: clinica-staging-service
+  namespace: default
+spec:
+  selector:
+    app: clinica
+    environment: staging
+  ports:
+  - port: 80
+    targetPort: 9091
+    protocol: TCP
+  type: LoadBalancer

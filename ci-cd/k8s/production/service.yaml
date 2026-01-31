@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: clinica-production-service
+  namespace: default
+spec:
+  selector:
+    app: clinica
+    environment: production
+  ports:
+  - port: 80
+    targetPort: 9091
+    protocol: TCP
+  type: LoadBalancer

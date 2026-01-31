@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  clinica-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9091:9091"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/clinica
+      - SPRING_DATASOURCE_USERNAME=clinica
+      - SPRING_DATASOURCE_PASSWORD=clinica123
+      - DOCTOR_SERVICE_URL=http://doctor-service:9092
+      - DOCTOR_SERVICE_USERNAME=admin
+      - DOCTOR_SERVICE_PASSWORD=password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - clinica-network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=clinica
+      - POSTGRES_USER=clinica
+      - POSTGRES_PASSWORD=clinica123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinica -d clinica"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clinica-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@clinica.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    networks:
+      - clinica-network
+
+  doctor-service:
+    # Assuming doctor service is also containerized
+    image: doctor-service:latest
+    ports:
+      - "9092:9092"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - clinica-network
+
+  sonarqube:
+    image: sonarqube:community
+    ports:
+      - "9000:9000"
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://postgres:5432/sonarqube
+      - SONARQUBE_JDBC_USERNAME=sonarqube
+      - SONARQUBE_JDBC_PASSWORD=sonarqube123
+    depends_on:
+      - postgres
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    networks:
+      - clinica-network
+
+volumes:
+  postgres_data:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+
+networks:
+  clinica-network:
+    driver: bridge

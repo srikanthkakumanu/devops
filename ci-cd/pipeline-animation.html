@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinica CI/CD Pipeline Animation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .mermaid {
+            text-align: center;
+        }
+        .step-highlight {
+            animation: highlight 2s ease-in-out;
+        }
+        @keyframes highlight {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005aa3;
+        }
+        .legend {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Clinica Microservice CI/CD Pipeline Animation</h1>
+
+    <div class="controls">
+        <button onclick="startAnimation()">Start Animation</button>
+        <button onclick="resetAnimation()">Reset</button>
+    </div>
+
+    <div class="mermaid" id="mermaid-diagram">
+        graph TD
+            A[Code Push/PR] --> B[CI Pipeline Trigger]
+
+            subgraph CI_Pipeline [CI Pipeline]
+                B --> C[Checkout Code]
+                C --> D[Setup JDK 21]
+                D --> E[Cache Gradle]
+                E --> F[Build Application]
+                F --> G[Unit Tests]
+                G --> H[JaCoCo Coverage]
+                H --> I[Codecov Upload]
+
+                I --> J[Integration Tests]
+                J --> K[Acceptance Tests]
+
+                K --> L[SonarQube Analysis]
+                L --> M[Quality Gate Check]
+
+                M --> N[Trivy Security Scan]
+                N --> O[Dependency Check]
+                O --> P[License Check]
+
+                P --> Q[Build Docker Image]
+                Q --> R[Test Docker Container]
+                R --> S[Upload Artifacts]
+
+                S --> T[CI Success]
+            end
+
+            subgraph CD_Pipeline [CD Pipeline]
+                T --> U[CD Pipeline Trigger]
+
+                U --> V[Build & Push Docker Image]
+                V --> W[Deploy to Staging]
+                W --> X[Smoke Tests]
+                X --> Y[Performance Tests]
+
+                Y --> Z[Deploy to Production]
+                Z --> AA[Production Smoke Tests]
+                AA --> BB[Notifications]
+            end
+
+            %% Styling
+            classDef trigger fill:#e1f5fe
+            classDef build fill:#f3e5f5
+            classDef test fill:#e8f5e8
+            classDef quality fill:#fff3e0
+            classDef security fill:#ffebee
+            classDef deploy fill:#f3e5f5
+            classDef success fill:#e8f5e8
+
+            class A,B,U trigger
+            class C,D,E,F,V,W,Z build
+            class G,H,I,J,K,X,Y,AA test
+            class L,M quality
+            class N,O,P security
+            class Q,R,S deploy
+            class T,BB success
+    </div>
+
+    <div class="legend">
+        <h3>Animation Legend</h3>
+        <p>The animation will highlight each step in sequence, showing the flow from code commit to production deployment.</p>
+        <ul>
+            <li><strong>Blue:</strong> Triggers and initial setup</li>
+            <li><strong>Purple:</strong> Build and deployment steps</li>
+            <li><strong>Green:</strong> Testing and success states</li>
+            <li><strong>Orange:</strong> Code quality analysis</li>
+            <li><strong>Red:</strong> Security scanning</li>
+        </ul>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+
+        const steps = [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+            'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'BB'
+        ];
+
+        let currentStep = 0;
+        let animationInterval;
+
+        function startAnimation() {
+            resetAnimation();
+            animationInterval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    const nodeId = steps[currentStep];
+                    const node = document.querySelector(`[id*="${nodeId}"]`);
+                    if (node) {
+                        node.classList.add('step-highlight');
+                    }
+                    currentStep++;
+                } else {
+                    clearInterval(animationInterval);
+                }
+            }, 1000); // Highlight each step for 1 second
+        }
+
+        function resetAnimation() {
+            clearInterval(animationInterval);
+            currentStep = 0;
+            document.querySelectorAll('.step-highlight').forEach(el => {
+                el.classList.remove('step-highlight');
+            });
+        }
+    </script>
+</body>
+</html>

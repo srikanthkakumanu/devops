@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clinica-config
+  namespace: default
+data:
+  doctor.service.url: "http://doctor-service.staging.svc.cluster.local:8080"
+  spring.profiles.active: "staging"

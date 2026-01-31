@@ -1,0 +1,133 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: srikanthkakumanu/clinica
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  deploy-staging:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name clinica-staging-cluster --region us-east-1
+
+    - name: Deploy to staging
+      run: |
+        sed -i 's|{{IMAGE_TAG}}|${{ github.sha }}|g' k8s/staging/deployment.yaml
+        kubectl apply -f k8s/staging/
+        kubectl rollout status deployment/clinica-staging
+
+    - name: Run smoke tests
+      run: |
+        EXTERNAL_IP=$(kubectl get svc clinica-staging-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        echo "Testing against: http://$EXTERNAL_IP"
+        # Add smoke test commands here
+
+    - name: Run performance tests
+      run: |
+        # Run JMeter performance tests
+        ./jmeter/bin/jmeter -n -t performance-tests/clinica-performance-test.jmx -l results.jtl
+        # Analyze results
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name clinica-prod-cluster --region us-east-1
+
+    - name: Deploy to production
+      run: |
+        sed -i 's|{{IMAGE_TAG}}|${{ github.sha }}|g' k8s/production/deployment.yaml
+        kubectl apply -f k8s/production/
+        kubectl rollout status deployment/clinica-production
+
+    - name: Run production smoke tests
+      run: |
+        EXTERNAL_IP=$(kubectl get svc clinica-production-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        echo "Testing against: http://$EXTERNAL_IP"
+        # Add production smoke test commands here
+
+    - name: Notify deployment
+      run: |
+        # Send notification to Slack, email, etc.
+        echo "Deployment to production completed successfully"
