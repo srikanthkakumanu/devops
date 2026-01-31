@@ -11,6 +11,7 @@ The Clinica microservice is a secure Spring Boot application for managing clinic
 - **Input Validation**: Comprehensive validation with meaningful error messages
 - **Security**: HTTP Basic Authentication with OWASP best practices
 - **API Documentation**: Swagger UI for interactive API exploration
+- **Sidecar Health Check**: Dedicated health monitoring container for comprehensive health assessment
 
 ### Technology Stack
 
@@ -20,6 +21,30 @@ The Clinica microservice is a secure Spring Boot application for managing clinic
 - **Build Tool**: Gradle 9.3.1
 - **Container**: Docker
 - **Orchestration**: Kubernetes
+- **Health Check**: Sidecar pattern with curl-based monitoring
+
+## Sidecar Health Check Pattern
+
+The Clinica microservice implements a sidecar health check pattern using a dedicated container that performs comprehensive health monitoring alongside the main application.
+
+### How It Works
+
+1. **Sidecar Container**: A lightweight curl-based container runs alongside the main application
+2. **Continuous Monitoring**: Performs health checks every 30 seconds
+3. **Comprehensive Checks**:
+   - Main application `/actuator/health` endpoint
+   - Potential database connectivity (extensible)
+   - External service dependencies (extensible)
+4. **Status Reporting**: Maintains health status in a shared volume
+5. **Kubernetes Integration**: Uses liveness and readiness probes on the sidecar
+
+### Benefits
+
+- **Enhanced Reliability**: More sophisticated health checks than built-in probes
+- **Independent Monitoring**: Health checks run independently of the main application
+- **Extensible**: Easy to add custom health checks (database, external services, etc.)
+- **Logging**: Detailed health check logs for troubleshooting
+- **Zero-Trust**: Separate container ensures unbiased health assessment
 
 ## Prerequisites
 
@@ -66,7 +91,7 @@ kubectl apply -f ingress.yaml
 
 ### 3. Verify Deployment
 
-```bash
+````bash
 # Check pod status
 kubectl get pods -l app=clinica
 
@@ -76,8 +101,35 @@ kubectl get svc clinica-service
 # Check ingress
 kubectl get ingress clinica-ingress
 
-# View logs
-kubectl logs -l app=clinica
+# View main application logs
+kubectl logs -l app=clinica -c clinica
+
+# View sidecar health check logs
+kubectl logs -l app=clinica -c healthcheck-sidecar
+
+# Check sidecar health status
+kubectl exec <pod-name> -c healthcheck-sidecar -- cat /tmp/health-status
+
+### 4. Monitor Sidecar Health Checks
+
+Use the provided monitoring script to continuously monitor the sidecar health check status:
+
+```bash
+# Make script executable (if not already)
+chmod +x monitor-health.sh
+
+# Monitor specific pod
+./monitor-health.sh clinica-deployment-12345-abcde
+````
+
+The script will display:
+
+- Current health status (healthy/unhealthy)
+- Recent health check logs
+- Continuous monitoring every 10 seconds
+
+```
+
 ```
 
 ### 4. Access the Application
@@ -129,6 +181,9 @@ kubectl rollout status deployment/clinica-deployment
 ```bash
 # Delete all resources
 kubectl delete -f .
+
+# Delete pods by label (includes both main and sidecar containers)
+kubectl delete pod -l "app.kubernetes.io/name=clinica"
 
 # Delete namespace (if using custom namespace)
 kubectl delete namespace <namespace>
@@ -185,21 +240,27 @@ SPRING_JPA_HIBERNATE_DDL_AUTO: 'update'
    - Verify resource limits
    - Check logs: `kubectl logs <pod-name>`
 
-2. **Service not accessible**
+2. **Sidecar health check failures**
+   - Check sidecar logs: `kubectl logs <pod-name> -c healthcheck-sidecar`
+   - Verify main app health endpoint: `curl http://localhost:9091/actuator/health`
+   - Check shared volume: `kubectl exec <pod-name> -c healthcheck-sidecar -- ls -la /tmp/`
+
+3. **Service not accessible**
    - Verify service selector matches deployment labels
    - Check firewall/security groups
-   - Test internal access: `kubectl port-forward svc/clinica-service 9091:9091`
+   - Test internal access via service: `kubectl port-forward svc/clinica-service 9091:9091`
+   - Test internal access via pod: `kubectl port-forward clinica 9090:9091`
 
-3. **Ingress not working**
+4. **Ingress not working**
    - Ensure Ingress Controller is installed
    - Check ingress class annotation
    - Verify DNS/host configuration
 
-4. **Authentication issues**
+5. **Authentication issues**
    - Default credentials: admin/admin123 or user/user123
    - Check ConfigMap for correct profile settings
 
-5. **Doctor service integration**
+6. **Doctor service integration**
    - Ensure doctor service is deployed and accessible
    - Verify DOCTOR_SERVICE_URL in ConfigMap
    - Check network policies for cross-service communication

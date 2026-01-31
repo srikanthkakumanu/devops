@@ -48,4 +48,60 @@ spec:
             port: 9091
           initialDelaySeconds: 60
           periodSeconds: 10
+      - name: healthcheck-sidecar
+        image: curlimages/curl:8.6.0
+        command:
+        - /bin/sh
+        - -c
+        - |
+          while true; do
+            # Perform comprehensive health checks
+            echo "$(date): Starting health check cycle" >> /tmp/health.log
+            
+            # Check main application health endpoint
+            if curl -f -s http://localhost:9091/actuator/health > /dev/null; then
+              echo "$(date): Main application health check PASSED" >> /tmp/health.log
+              
+              # Additional checks can be added here
+              # Check database connectivity if needed
+              # Check external service dependencies
+              
+              # Report healthy status
+              echo "healthy" > /tmp/health-status
+            else
+              echo "$(date): Main application health check FAILED" >> /tmp/health.log
+              echo "unhealthy" > /tmp/health-status
+            fi
+            
+            sleep 30
+          done
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "50m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: health-status
+          mountPath: /tmp
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - cat /tmp/health-status | grep -q healthy
+          initialDelaySeconds: 30
+          periodSeconds: 60
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - cat /tmp/health-status | grep -q healthy
+          initialDelaySeconds: 10
+          periodSeconds: 30
+      volumes:
+      - name: health-status
+        emptyDir: {}
           failureThreshold: 30

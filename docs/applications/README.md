@@ -16,21 +16,31 @@ The Clinica microservice is a Spring Boot-based REST API that provides clinic ma
 - **Database**: H2 (in-memory) / PostgreSQL (production)
 - **Security**: HTTP Basic Authentication
 - **API**: REST with HATEOAS
+- **Health Monitoring**: Sidecar health check pattern
 
 ### Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐
-│   Clinica API   │────│   Doctor API    │
-│   (Port: 9091)  │    │   (External)    │
-└─────────────────┘    └─────────────────┘
-         │
-         ▼
-┌─────────────────┐
-│     H2 DB       │
-│   (In-memory)   │
-└─────────────────┘
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Clinica API   │    │ Health Sidecar  │    │   Doctor API    │
+│   (Port: 9091)  │◄──►│   Monitor       │    │   (External)    │
+│                 │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                        │
+         └────────────────────────┼─────────────────────────────┘
+                                  ▼
+                         ┌─────────────────┐
+                         │     H2 DB       │
+                         │   (In-memory)   │
+                         └─────────────────┘
 ```
+
+**Sidecar Health Check Pattern:**
+
+- Dedicated monitoring container runs alongside main application
+- Performs continuous health checks every 30 seconds
+- Independent health assessment for enhanced reliability
+- Comprehensive logging and status reporting
 
 ### API Endpoints
 
@@ -78,20 +88,26 @@ DOCTOR_SERVICE_URL=http://doctor-service:8080
 #### Staging Environment
 
 - **Replicas**: 2
-- **Resources**:
+- **Resources** (Main Container):
   - CPU: 250m - 500m
   - Memory: 512Mi - 1Gi
+- **Resources** (Sidecar Container):
+  - CPU: 50m - 100m
+  - Memory: 32Mi - 64Mi
 - **Health Checks**:
-  - Readiness: `/actuator/health`
-  - Liveness: `/actuator/health`
+  - Readiness: `/actuator/health` (main) + sidecar status check
+  - Liveness: `/actuator/health` (main) + sidecar status check
   - Initial Delay: 60s
 
 #### Production Environment
 
 - **Replicas**: 3
-- **Resources**:
+- **Resources** (Main Container):
   - CPU: 500m - 1000m
   - Memory: 1Gi - 2Gi
+- **Resources** (Sidecar Container):
+  - CPU: 50m - 100m
+  - Memory: 32Mi - 64Mi
 - **Health Checks**: Same as staging
 - **Scaling**: Horizontal Pod Autoscaler (HPA)
 
@@ -129,6 +145,15 @@ spec:
             limits:
               memory: '2Gi'
               cpu: '1000m'
+        - name: healthcheck-sidecar
+          image: curlimages/curl:8.6.0
+          resources:
+            requests:
+              memory: '32Mi'
+              cpu: '50m'
+            limits:
+              memory: '64Mi'
+              cpu: '100m'
 ```
 
 #### Service
@@ -188,9 +213,18 @@ The Clinica microservice is fully integrated with the CI/CD pipeline:
 
 #### Health Checks
 
-- **Application Health**: Spring Boot Actuator
+- **Application Health**: Spring Boot Actuator (`/actuator/health`)
+- **Sidecar Health Check**: Dedicated monitoring container with curl-based checks
 - **Container Health**: Docker health checks
-- **Kubernetes**: Readiness and liveness probes
+- **Kubernetes**: Readiness and liveness probes on both main and sidecar containers
+
+**Sidecar Health Check Features:**
+
+- Continuous monitoring every 30 seconds
+- Independent health assessment
+- Comprehensive logging (`/tmp/health.log`)
+- Status reporting via shared volume
+- Extensible for additional checks (database, external services)
 
 #### Metrics
 
@@ -249,6 +283,22 @@ kubectl exec -it <pod-name> -- curl -f http://localhost:9091/actuator/health
 
 # Check application logs
 kubectl logs -f deployment/clinica-production --tail=100
+```
+
+##### Sidecar Health Check Issues
+
+```bash
+# Check sidecar health status
+kubectl exec <pod-name> -c healthcheck-sidecar -- cat /tmp/health-status
+
+# View sidecar logs
+kubectl logs -f <pod-name> -c healthcheck-sidecar
+
+# Test main application health from sidecar
+kubectl exec <pod-name> -c healthcheck-sidecar -- curl -f http://localhost:9091/actuator/health
+
+# Check shared volume
+kubectl exec <pod-name> -c healthcheck-sidecar -- ls -la /tmp/
 ```
 
 ### Scaling Strategies
