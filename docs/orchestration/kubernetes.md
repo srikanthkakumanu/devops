@@ -4,7 +4,6 @@
 
 ## 1 — Overview
 
-
 ### 1.1 — What is Kubernetes
 
 **Kubernetes a.k.a. K8s (_kaytes_)** originated from Google, and is the 3rd generation project (previous internal projects are Borg and Omega).
@@ -18,17 +17,14 @@ It is donated to Cloud Native Computing Foundation (CNCF).
 
 ### 1.2 — What K8s Can and Can't do
 
-
-
 | **Can**                                                     | **Can't**                                                                                 |
-|-------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | Service discovery and load balancing                        | Does not deploy source code                                                               |
 | Storage Orchestration (Local or cloud based)                | Does not build an application                                                             |
 | Automated rollouts and rollbacks                            | Does not provide application level services such as Message buses, databases, caches etc. |
 | **Self-healing** — It can monitor the health of containers  |                                                                                           |
 | Secret and configuration management                         |                                                                                           |
 | Use the same API across on-premise and every cloud provider |                                                                                           |
-
 
 ## 2 — K8s architecture
 
@@ -44,11 +40,11 @@ The K8s architecture broadly classified into:
 
 Important to note that: _Please refer to above diagram_.
 
-- A **container** runs inside a **Pod**. 
+- A **container** runs inside a **Pod**.
 - A **pod** runs in a **Node**.
 - A **node** runs in a cluster.
 
-![Kubernetes Cluster Structure](/home/skakumanu/personal/projects/devops/docs/Kubernetes_components.png)
+![Kubernetes Cluster Structure](./Kubernetes_components.png)
 
 ### 2.1 — K8s Cluster
 
@@ -58,27 +54,26 @@ A K8s cluster consists of a **master node** and set of **worker nodes**.
 
 A **K8s master node a.k.a. Control Plane** consists of **Kube API server, etcd, scheduler, controller manager and cloud controller manager**.
 
-#### 2.2.1 — Kube API server 
+#### 2.2.1 — Kube API server
 
-- It exposes the K8s REST API via the implementation _kube-apiserver_. 
+- It exposes the K8s REST API via the implementation _kube-apiserver_.
 - It is the frontend for K8s master node a.k.a. Control Plane.
 - It can scale horizontally (deploying more instances). We can run several instances of _kube-apiserver_ and balance traffic between those instances.
 
-
 #### 2.2.2 — etcd
 
-- It is an open source key-value data store. 
+- It is an open source key-value data store.
 - It is the single source of truth at any given point of time.
-- It is built on top of **Raft consensus algorithm/protocol**. 
+- It is built on top of **Raft consensus algorithm/protocol**.
 - It is used to store K8s config data, state data and metadata.
 - It is fully replicated, reliably consistent, highly available, fast, secure and simple to use.
 - An etcd cluster consists of a leader and couple of follower nodes. A leader election, replication works based on consensus and quorum.
 
-**Raft consensus algorithm** 
+**Raft consensus algorithm**
 
 Raft stands for **Replicated/Reliable And Fault Tolerant**,
 is an algorithm, protocol and state machine.
-It is a distributed protocol designed to achieve consensus in a 
+It is a distributed protocol designed to achieve consensus in a
 replicated state machine. There are many consensus algorithms such as
 Proof Of Work (used by Bitcoin), Proof Of Stake (PoS), Paxos etc.
 
@@ -86,15 +81,14 @@ Proof Of Work (used by Bitcoin), Proof Of Stake (PoS), Paxos etc.
 
 A _kube-scheduler_ that watches for newly created _**pods**_ with no assigned **_node_** and selects a **_node_** for them to run on.
 
-
 #### 2.2.4 — Controller Manager
 
 A _kube-controller-manager_ that manages/runs several controller processes.
-There are many different types of controllers  — Node controller, Job controller, EndpointSlice controller, ServiceAccount controller etc.
+There are many different types of controllers — Node controller, Job controller, EndpointSlice controller, ServiceAccount controller etc.
 
 #### 2.2.5 — Cloud Controller Manager
 
-A _cloud-controller-manager_ that embeds cloud-specific control logic. 
+A _cloud-controller-manager_ that embeds cloud-specific control logic.
 It lets you link your cluster into your cloud provider's API.
 It only runs controllers that are specific to your cloud provider.
 
@@ -103,38 +97,39 @@ It has cloud provider dependencies such as Node controller, Route controller, Se
 ### 2.3 — K8s Worker Nodes
 
 Every worker node has these node components.
-These node components run on every node, 
+These node components run on every node,
 maintaining running pods and providing the K8s runtime environment.
 
 Each node/worker node consists of —
+
 - Kubelet
 - Kube-Proxy
 - Container Runtime
 
-Basically, A **container** runs inside a **Pod**, 
+Basically, A **container** runs inside a **Pod**,
 a **pod** runs in a **Node**,
-a **node** runs in a cluster, 
+a **node** runs in a cluster,
 and all applications are to be containerized.
 
 #### 2.3.1 — Kubelet
 
-It is an agent that runs on every node in a cluster. 
+It is an agent that runs on every node in a cluster.
 It makes sure that
 containers in a _pod_ are running and healthy.
 
 #### 2.3.2 — Kube-Proxy
 
-- Kube-Proxy runs on every node in a cluster. 
+- Kube-Proxy runs on every node in a cluster.
 - maintains network rules on nodes.
 - It allows network communication to a Pod from inside/outside a network.
 
 #### 2.3.3 — Container Runtime
 
-Every node consists of a Container Runtime where Pods are present. 
+Every node consists of a Container Runtime where Pods are present.
 
-There are two important standards around containers — 
+There are two important standards around containers —
 
-- Open Container Initiative (OCI) — 
+- Open Container Initiative (OCI) —
   - A specification and set of standards for container images and running containers.
   - Describes the image format, runtime and distribution.
   - It also provides an OCI complaint tool called _runc_ (low level runtime) for creating and running container processes.
@@ -142,9 +137,10 @@ There are two important standards around containers —
 
 - Container Runtime Interface (CRI) in Kubernetes —
   - It is an API specification for Container runtime Engine.
-  - It allows us to run different container runtimes in Kubernetes. 
+  - It allows us to run different container runtimes in Kubernetes.
 
-There are Container runtimes such as 
+There are Container runtimes such as
+
 - **_Dockershim_** — was a component of Kubernetes that added the required CRI abstraction in front of Docker Engine to make Kubernetes recognize Docker Engine as CRI compatible. _It has been deprecated_.
 - **_containerd_** — is from Docker, it uses _runC_ under the hood for container execution.
 - _**cri-o**_ — is from RedHat, IBM etc. It is a CRI implementation that enables using any OCI compatible runtimes.
@@ -153,24 +149,24 @@ There are Container runtimes such as
 
 There are several ways to run Kubernetes on developer/local machine.
 
-- **microk8s** — 
-  - MicroK8s is a fully compliant Kubernetes distribution with a smaller CPU and memory footprint. 
+- **microk8s** —
+  - MicroK8s is a fully compliant Kubernetes distribution with a smaller CPU and memory footprint.
   - It supports multiple worker nodes.
-- **Docker desktop** — 
+- **Docker desktop** —
   - Limited to 1 node.
-- **minikube** — 
-  - Minikube is a tool that enables us to run a local, **single-node Kubernetes cluster** on our machine. 
-  - It supports multiple worker nodes. 
+- **minikube** —
+  - Minikube is a tool that enables us to run a local, **single-node Kubernetes cluster** on our machine.
+  - It supports multiple worker nodes.
   - It can also run on Docker Desktop (not mandatory), Hyper-V, Virtual Box, VMWare etc.
-- **Kind** — 
+- **Kind** —
   - Kind stands for **Kubernetes In Docker**.
   - Only requires Docker installed and no need of another VM installation.
   - **Installs the nodes as containers**.
-  - It can emulate multiple control planes and multiple worker nodes. 
+  - It can emulate multiple control planes and multiple worker nodes.
 
 ### 3.1 — kubectl CLI
 
-- kubectl is Kubernetes CLI. 
+- kubectl is Kubernetes CLI.
 - It communicates with _**kube-apiserver**_ (Kubernetes API server).
 - Connection/configuration stored locally at `${HOME}/.kube/config`.
 
@@ -183,10 +179,11 @@ There are several ways to run Kubernetes on developer/local machine.
 
 ## 5 — Declarative Vs. Imperative
 
-Imperative approach advocates the usage of _kubectl_, 
+Imperative approach advocates the usage of _kubectl_,
 and Declarative approach advocates the usage of YAML.
 
 CLI Examples:-
+
 ```commandline
 kubectl run mynginx --image=nginx --port=80
 kubectl create deploy mynginx --image=nginx --port=80 --replicas=3
@@ -196,6 +193,7 @@ kubectl delete pod nginx
 ```
 
 YAML Example:-
+
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -219,42 +217,39 @@ apiVersion:
 kind:
 metadata:
 
-
 spec:
-
 ```
 
 **Kind Types and Versions**
 
 | Kind       | Version |
-|------------|---------|
+| ---------- | ------- |
 | Pod        | v1      |
 | Service    | v1      |
 | ReplicaSet | apps/v1 |
 | Deployment | apps/v1 |
 
-
 ## 6 — Pod
 
 Typically, an application instance running as a container.
 Containers are encapsulated into an object known as **Pods**.
-**A Pod is an instance of an application**. 
+**A Pod is an instance of an application**.
 A Pod is the smallest object that we can create in K8s.
-A Pod has 1:1 relationship with a container. 
-However, it is not a limitation but is a best practice. 
-Thus, to create more application instances (aka containers), 
+A Pod has 1:1 relationship with a container.
+However, it is not a limitation but is a best practice.
+Thus, to create more application instances (aka containers),
 we create more Pods.
 
-We can still run additional containers within a Pod along with the application container, 
-these additional containers are considered as 
+We can still run additional containers within a Pod along with the application container,
+these additional containers are considered as
 **helper or sidecar container** to perform auxiliary tasks.
 
-K8s pods are designed to be ephemeral and stateless, 
-managed by higher-level controllers like 
+K8s pods are designed to be ephemeral and stateless,
+managed by higher-level controllers like
 Deployments, StatefulSets, or DaemonSets2.
 
-K8s doesn't support stop/pause of current state of pod and 
-resume when needed. Thus, graceful/forceful deletion of a Pod 
+K8s doesn't support stop/pause of current state of pod and
+resume when needed. Thus, graceful/forceful deletion of a Pod
 is the solution.
 
 ## 7 — Replica Sets
@@ -262,32 +257,30 @@ is the solution.
 A ReplicaSet's purpose is to maintain a stable set of replica Pods running at any given time. As such, it is often used to guarantee the availability of a specified number of identical Pods.
 
 Replicaset's ensures the availability of pods.
-They monitor the pods and filter them with the help of `labels` (defined under `metadata` section). 
+They monitor the pods and filter them with the help of `labels` (defined under `metadata` section).
 
 ## 7 — Deployments
 
-A Deployment provides declarative updates for Pods and Replicasets. 
+A Deployment provides declarative updates for Pods and Replicasets.
 We can define Deployments to create new Replicasets or to remove
-existing Deployments and adopt all their resources with 
+existing Deployments and adopt all their resources with
 new Deployments.
 
 ## 8 — Services
 
 A service is a method for exposing a network application that is running
-as one or more Pods in a cluster. 
+as one or more Pods in a cluster.
 
-A service enables the communication between applications 
-in a K8s cluster and also can expose outside the cluster 
+A service enables the communication between applications
+in a K8s cluster and also can expose outside the cluster
 to help the apps that are outside the cluster.
 It provides an endpoint for other services to connect.
 
 We have three types of services:
 
-1. ClusterIP service — It does not expose externally but helps different services to communicate each other. 
+1. ClusterIP service — It does not expose externally but helps different services to communicate each other.
 2. NodePort service — It exposes a port outside the cluster for external apps.
 3. Load Balancer service — Provisions a load balancer for a service for external apps to connect and distribute the load among multiple nodes.
-
-
 
 ## — CLI - Commands Cheatsheet
 
@@ -298,7 +291,6 @@ Help: `kubectl --help`
 To verify the Kubernetes Installation: `kubectl cluster-info`
 
 To all the information in K8s cluster: `kubectl get all`
-
 
 ### Contexts
 
@@ -332,10 +324,9 @@ A resource can be a Pod/Deployment/Service/Replicaset/StatefulSet etc.
 
 `kubectl create -f [YAML file]`
 
-
 ### Pods
 
-List of Pods: 
+List of Pods:
 
 `kubectl get pods`
 
@@ -347,19 +338,19 @@ List of Pods:
 
 `kubectl get po -o json`
 
-Detailed info about a Pod: 
+Detailed info about a Pod:
 
 `kubectl describe pod webserver`
 
 `kubectl describe po webserver`
 
-Create Pods: 
+Create Pods:
 `kubectl run webserver --image=nginx --port=80` or, `kubectl run mariadb-test-pod --image=mariadb --env="MARIADB_ROOT_PASSWORD=secret"`
 
 Create Pods using YAML (Can use either of the commands):
 `kubectl apply -f pod.yaml` or, `kubectl create -f pod.yaml`
 
-Delete Pods: 
+Delete Pods:
 
 `kubectl delete pod webserver`
 
@@ -417,7 +408,6 @@ Delete the Replicaset:
 
 `kubectl delete replicaset myapp-replicaset`
 
-
 ### Deployments
 
 Create a Deployment:
@@ -446,8 +436,7 @@ Or, we can directly refer to container name and update new image version.
 
 Ex:- `kubectl set image deployment/api-deployment.yml nginx-container=nginx:1.9.1`
 
-
-List the Deployments: 
+List the Deployments:
 
 `kubectl get deploy`
 
@@ -455,14 +444,13 @@ List the Deployments:
 
 `kubectl get deployments`
 
-Delete Deployments: (mynginx - can also be the _name_ property value (In metadata) from deployment YAML) 
+Delete Deployments: (mynginx - can also be the _name_ property value (In metadata) from deployment YAML)
 
 `kubectl delete deploy mynginx`
 
 `kubectl delete deployment mynginx`
 
 `kubectl scale deployment my-deployment -replicas=0`
-
 
 ### Services
 
@@ -483,7 +471,5 @@ Verify if the service is created:
 `kubectl get po,svc`
 
 Access the exposed NGINX homepage via browser by given port number.
-
-
 
 </div>
